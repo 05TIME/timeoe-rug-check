@@ -13,8 +13,6 @@ describe("evaluate", () => {
   it.each([
     ["mintAuthorityActive", true, /Mint authority/],
     ["freezeAuthorityActive", true, /Freeze authority/],
-    ["honeypot", true, /honeypot/],
-    ["top10HolderShare", 0.9, /large share/],
     ["liquidityUsd", 10, /liquidity is low/],
     ["poolAgeHours", 1, /very new/],
     ["liquidityDropPct", 0.8, /dropped sharply/],
@@ -31,6 +29,19 @@ describe("evaluate", () => {
   it("unknown liquidity trend says 'trend unknown'", () => {
     const { liquidityDropPct, ...s } = clean;
     expect(evaluate(s, T).reasons.join(" ")).toMatch(/trend unknown/);
+  });
+  it.each([
+    ["honeypot", true, /possible honeypot/],
+    ["top10HolderShare", 0.9, /large share/],
+  ] as const)("%s red flag is a CAUTION, not a FAIL", (k, v, re) => {
+    const r = evaluate({ ...clean, [k]: v }, T);
+    expect(r.verdict).toBe("CAUTION");
+    expect(r.reasons.some((x) => re.test(x))).toBe(true);
+  });
+  it("hard fails still list before the softened cautions", () => {
+    const r = evaluate({ ...clean, honeypot: true, top10HolderShare: 0.9, mintAuthorityActive: true }, T);
+    expect(r.verdict).toBe("FAIL");
+    expect(r.reasons[0]).toMatch(/Mint authority/);
   });
   it("all-unknown is CAUTION", () => expect(evaluate({}, T).verdict).toBe("CAUTION"));
   it("thin pool and unavailable sources are cautions", () => {

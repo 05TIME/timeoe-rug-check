@@ -55,7 +55,7 @@ describe("checkMint (fixtures, no network)", () => {
     const supply = "8799430828123760242";
     const r = await checkMint(BONK, fake({ gecko: new Error("down"),
       getTokenLargestAccounts: { result: { value: [{ amount: supply }] } } }), NOW);
-    expect(r.verdict).toBe("FAIL");
+    expect(r.verdict).toBe("CAUTION");
     expect(r.reasons.join(" ")).toMatch(/large share/);
   });
   it("on-chain active mint authority is a FAIL even if GeckoTerminal says no", async () => {

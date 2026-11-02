@@ -43,11 +43,13 @@ export function evaluate(s: Signals, t: Thresholds): VerdictResult {
   if (s.freezeAuthorityActive === true) fails.push("Freeze authority is active, so the issuer can freeze anyone's tokens. Regulated stablecoins do this; meme tokens should not.");
   else if (s.freezeAuthorityActive === undefined) cautions.push("Could not confirm whether the freeze authority is revoked.");
 
-  if (s.honeypot === true) fails.push("Flagged as a possible honeypot: you may not be able to sell.");
+  // Honeypot flags come from third-party heuristics and are often missing or wrong, so a flag is a caution, not a hard fail.
+  if (s.honeypot === true) cautions.push("A data source flags this as a possible honeypot: you may not be able to sell. Test with a tiny amount first.");
   else if (s.honeypot === undefined) cautions.push("Honeypot status is unknown.");
 
   if (s.top10HolderShare === undefined) cautions.push("Holder concentration is unknown.");
-  else if (s.top10HolderShare > t.maxTop10HolderShare) fails.push("A small group of wallets holds a very large share of the supply.");
+  // Top-holder lists include exchange and pool wallets, so high concentration is a caution, not a hard fail.
+  else if (s.top10HolderShare > t.maxTop10HolderShare) cautions.push("A small group of wallets holds a very large share of the supply (this can include exchange and pool wallets).");
 
   if (s.liquidityUsd === undefined) cautions.push("No trading pool liquidity was found.");
   else if (s.liquidityUsd < t.minLiquidityUsd) fails.push("Pool liquidity is low, so the price can be moved or drained easily.");
