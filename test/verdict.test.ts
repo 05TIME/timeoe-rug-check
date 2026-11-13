@@ -163,3 +163,35 @@ describe("evaluate: thin-pool rule on total liquidity", () => {
     expect(evaluate({ ...base, totalLiquidityUsd: 600_000, fdvUsd: 600_000 * 300 }, { ...T, deepLiquidityUsd: 1e6 }).verdict).toBe("CAUTION");
   });
 });
+
+describe("evaluate: Solana honeypot-unknown rule", () => {
+  const sol: Signals = { ...clean, transferHook: false, nonTransferable: false, balanceMutable: false, defaultAccountFrozen: false };
+  delete (sol as any).honeypot;
+  it("all sell-blocking checks clean -> note only, PASS", () => {
+    const r = evaluate(sol, T);
+    expect(r.verdict).toBe("PASS");
+    expect(r.notes.join(" ")).toMatch(/No honeypot test exists for Solana/);
+  });
+  it.each(["freezeAuthorityActive", "transferHook", "nonTransferable", "balanceMutable", "defaultAccountFrozen"] as const)(
+    "%s unavailable keeps the honeypot caution", (k) => {
+      const s = { ...sol }; delete (s as any)[k];
+      const r = evaluate(s, T);
+      expect(r.verdict).toBe("CAUTION");
+      expect(r.reasons).toContain("Honeypot status is unknown.");
+    });
+  it.each([
+    ["freezeAuthorityActive", "FAIL"], ["transferHook", "CAUTION"], ["nonTransferable", "FAIL"], ["balanceMutable", "FAIL"], ["defaultAccountFrozen", "CAUTION"],
+  ] as const)("%s on keeps the honeypot caution (%s)", (k, v) => {
+    const r = evaluate({ ...sol, [k]: true }, T);
+    expect(r.verdict).toBe(v);
+    expect(r.reasons).toContain("Honeypot status is unknown.");
+  });
+  it("a heuristic honeypot flag is still a caution", () => {
+    expect(evaluate({ ...sol, honeypot: true }, T).verdict).toBe("CAUTION");
+  });
+  it("EVM is unchanged: unknown honeypot stays a caution even with the Solana fields clean", () => {
+    const r = evaluate({ ...sol, chainFamily: "evm", sourceVerified: true }, T);
+    expect(r.verdict).toBe("CAUTION");
+    expect(r.reasons).toContain("Honeypot status is unknown.");
+  });
+});

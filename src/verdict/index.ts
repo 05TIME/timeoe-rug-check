@@ -25,6 +25,8 @@ export interface Signals {
   /** Token-2022 transfer hook or transfer fee present. */
   transferHook?: boolean;
   transferFee?: boolean;
+  /** Token-2022 default account state is frozen (new accounts start frozen). */
+  defaultAccountFrozen?: boolean;
 
   /** Heuristic honeypot flag (e.g. GeckoTerminal). Caution only. */
   honeypot?: boolean;
@@ -95,6 +97,12 @@ export interface VerdictResult {
 
 const MAX_REASONS = 6;
 
+/** Solana: freeze authority revoked, no transfer hook, transferable, no balance-changing authority, accounts not frozen by default. All must be known. */
+export function solanaSellPathClean(s: Signals): boolean {
+  return s.freezeAuthorityActive === false && s.transferHook === false && s.nonTransferable === false
+    && s.balanceMutable === false && s.defaultAccountFrozen === false;
+}
+
 export function evaluate(s: Signals, t: Thresholds): VerdictResult {
   const fails: string[] = [];
   const cautions: string[] = [];
@@ -118,7 +126,13 @@ export function evaluate(s: Signals, t: Thresholds): VerdictResult {
   // Simulated honeypot (GoPlus EVM) is a hard fail; heuristic flags stay a caution.
   if (s.honeypotSimulated === true) fails.push("A buy-and-sell simulation shows this token cannot be sold (honeypot).");
   else if (s.honeypot === true) cautions.push("A data source flags this as a possible honeypot: you may not be able to sell. Test with a tiny amount first.");
-  else if (s.honeypot === undefined && s.honeypotSimulated === undefined) cautions.push("Honeypot status is unknown.");
+  else if (s.honeypot === undefined && s.honeypotSimulated === undefined) {
+    // Solana has no buy/sell simulation. When every on-chain way to block a sale is known to be off, the
+    // missing heuristic flag is informational only. Any of these unknown or on keeps the caution.
+    if (!evm && solanaSellPathClean(s)) notes.push("No honeypot test exists for Solana tokens; freeze authority, transfer hook, transfer blocks and balance control are all clear.");
+    else cautions.push("Honeypot status is unknown.");
+  }
+  if (!evm && s.defaultAccountFrozen === true) cautions.push("New token accounts start frozen, so the issuer must unfreeze wallets before they can move tokens.");
 
   if (s.cannotBuy === true) fails.push("The contract blocks buying.");
   if (s.nonTransferable === true) fails.push("The token cannot be transferred, so it cannot be sold.");

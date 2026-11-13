@@ -14,7 +14,9 @@ Thresholds can be tuned with the `RC_*` env vars in `src/server/config.ts` (defa
 | Transfer hook / transfer fee (Token-2022) | Solana | GoPlus | CAUTION |
 | Honeypot in buy/sell simulation | EVM | GoPlus `is_honeypot` | FAIL |
 | Possible honeypot (heuristic) | Solana | GeckoTerminal `is_honeypot` | CAUTION |
-| Honeypot status unknown | all | — | CAUTION |
+| Honeypot status unknown | EVM | — | CAUTION |
+| Honeypot status unknown | Solana | — | **Note only** when every sell-blocking check is known and clear: freeze authority revoked, no transfer hook, transferable, no balance-changing authority, accounts not frozen by default. If any of these is on or unavailable: CAUTION |
+| Accounts start frozen (Token-2022 default account state) | Solana | GoPlus `default_account_state` | CAUTION |
 | Buying blocked | EVM | GoPlus `cannot_buy` | FAIL |
 | Non-transferable | all | GoPlus | FAIL |
 | Buy or sell tax ≥ 50% (`RC_FAIL_TAX`) | EVM | GoPlus | FAIL |
@@ -38,6 +40,11 @@ Why the thin-pool rule has two tiers: large tokens trade mostly on centralized e
 small next to their valuation (live on 2026-11-13: USDC ≈ 210×, Bonk ≈ 230×, ARB ≈ 460× FDV-to-total-liquidity) even though
 hundreds of thousands to millions of dollars of liquidity can absorb ordinary trades. Below $500k of total liquidity the
 ratio is what matters, so the original 50× threshold applies there.
+
+Why the Solana honeypot rule: Solana has no buy/sell simulation like GoPlus runs on EVM chains, and GeckoTerminal
+usually reports "unknown". On Solana the ways an issuer can stop you selling are on-chain and are checked directly
+(freeze authority, transfer hook, non-transferable, balance-changing authority, default-frozen accounts), so when all of
+those are known to be clear the missing heuristic adds no information. A heuristic "possible honeypot" flag is still a CAUTION.
 
 Notes are informational lines returned next to the reasons (for example "Liquidity trend not tracked yet (first check)").
 They never change the verdict.

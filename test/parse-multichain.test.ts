@@ -106,7 +106,7 @@ describe("parseGoPlusEvm", () => {
 describe("parseGoPlusSolana", () => {
   it("Bonk: authorities revoked, holders, Token-2022 extras", () => {
     const g = p.parseGoPlusSolana(fx("goplus-bonk-sol.json"), BONK);
-    expect(g).toMatchObject({ symbol: "Bonk", mintAuthorityActive: false, freezeAuthorityActive: false, balanceMutable: false, nonTransferable: false, transferHook: false, transferFee: false, metadataMutable: true });
+    expect(g).toMatchObject({ symbol: "Bonk", mintAuthorityActive: false, freezeAuthorityActive: false, balanceMutable: false, nonTransferable: false, transferHook: false, transferFee: false, defaultAccountFrozen: false, metadataMutable: true });
     expect(g.holderCount).toBe(1021397);
     expect(g.top10HolderShare).toBeGreaterThan(0.2);
   });

@@ -251,6 +251,9 @@ export function parseGoPlusSolana(json: any, address: string): Partial<Signals> 
     nonTransferable: flag(r.non_transferable),
     transferHook: Array.isArray(r.transfer_hook) ? r.transfer_hook.length > 0 : undefined,
     transferFee: fee && typeof fee === "object" ? Object.keys(fee).length > 0 : undefined,
+    // SPL AccountState: 1 = initialized, 2 = frozen.
+    defaultAccountFrozen: r.default_account_state === "2" || r.default_account_state === 2 ? true
+      : r.default_account_state === "1" || r.default_account_state === 1 ? false : undefined,
     metadataMutable: status(r.metadata_mutable),
     top10HolderShare: topShare(r.holders),
     holderCount: num(r.holder_count),

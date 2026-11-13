@@ -28,6 +28,7 @@ export function securityFlags(s: Signals, family: ChainFamily, extra: GoPlusExtr
     if (s.balanceMutable !== undefined) out.push(tri(s.balanceMutable, "bad", "Balances cannot be changed by an authority", "An authority can change balances", ""));
     if (s.nonTransferable !== undefined) out.push(tri(s.nonTransferable, "bad", "Transferable", "Non-transferable", ""));
     if (s.transferHook !== undefined) out.push(tri(s.transferHook, "warn", "No transfer hook", "Transfer hook present", ""));
+    if (s.defaultAccountFrozen !== undefined) out.push(tri(s.defaultAccountFrozen, "warn", "Accounts not frozen by default", "Accounts start frozen", ""));
     if (s.transferFee !== undefined) out.push(tri(s.transferFee, "warn", "No transfer fee", "Transfer fee present", ""));
     if (extra.metadataMutable !== undefined) out.push(tri(extra.metadataMutable, "warn", "Metadata locked", "Metadata can be changed", ""));
     out.push(tri(s.honeypot, "warn", "Not flagged as honeypot", "Flagged as possible honeypot", "Honeypot: unknown"));

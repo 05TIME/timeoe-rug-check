@@ -144,7 +144,7 @@ export async function checkMint(mint: string, f: Fetcher = defaultFetch, now = D
   try { if (gp.status !== "fulfilled") throw 0; const g = p.parseGoPlusSolana(gp.value, mint);
     meta.name ??= g.name; meta.symbol ??= g.symbol;
     s.mintAuthorityActive ??= g.mintAuthorityActive; s.freezeAuthorityActive ??= g.freezeAuthorityActive; s.top10HolderShare ??= g.top10HolderShare;
-    s.balanceMutable = g.balanceMutable; s.nonTransferable = g.nonTransferable; s.transferHook = g.transferHook; s.transferFee = g.transferFee;
+    s.balanceMutable = g.balanceMutable; s.nonTransferable = g.nonTransferable; s.transferHook = g.transferHook; s.transferFee = g.transferFee; s.defaultAccountFrozen = g.defaultAccountFrozen;
     gpExtra = g; mark("GoPlus", true, false, `https://gopluslabs.io/token-security/solana/${mint}`);
   } catch { mark("GoPlus", false, false); }
 
