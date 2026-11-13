@@ -1,0 +1,181 @@
+{
+ "schemaVersion": "1.0.0",
+ "pairs": [
+  {
+   "chainId": "bsc",
+   "dexId": "pancakeswap",
+   "url": "https://dexscreener.com/bsc/0xafb2da14056725e3ba3a30dd846b6bbbd7886c56",
+   "pairAddress": "0xAfB2Da14056725E3BA3a30dD846B6BBbd7886c56",
+   "labels": [
+    "v3"
+   ],
+   "baseToken": {
+    "address": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+    "name": "PancakeSwap Token",
+    "symbol": "Cake"
+   },
+   "quoteToken": {
+    "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+    "name": "Wrapped BNB",
+    "symbol": "WBNB"
+   },
+   "priceNative": "0.002716",
+   "priceUsd": "1.74",
+   "txns": {
+    "m5": {
+     "buys": 9,
+     "sells": 3
+    },
+    "h1": {
+     "buys": 84,
+     "sells": 147
+    },
+    "h6": {
+     "buys": 444,
+     "sells": 554
+    },
+    "h24": {
+     "buys": 2971,
+     "sells": 3021
+    }
+   },
+   "volume": {
+    "h24": 1178091.7,
+    "h6": 163769.97,
+    "h1": 26022.48,
+    "m5": 2711.42
+   },
+   "priceChange": {
+    "m5": -0.07,
+    "h1": 0.46,
+    "h6": 0.91,
+    "h24": -1.48
+   },
+   "liquidity": {
+    "usd": 818734.57,
+    "base": 268727,
+    "quote": 548.1757
+   },
+   "fdv": 629399861,
+   "marketCap": 629399861,
+   "pairCreatedAt": 1680528785000
+  },
+  {
+   "chainId": "bsc",
+   "dexId": "pancakeswap",
+   "url": "https://dexscreener.com/bsc/0x8ec186cd1ad51c380bd23fde29f852226647616c",
+   "pairAddress": "0x8ec186cD1Ad51c380Bd23fDe29f852226647616c",
+   "labels": [
+    "v3"
+   ],
+   "baseToken": {
+    "address": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+    "name": "PancakeSwap Token",
+    "symbol": "Cake"
+   },
+   "quoteToken": {
+    "address": "0x55d398326f99059fF775485246999027B3197955",
+    "name": "Tether USD",
+    "symbol": "USDT"
+   },
+   "priceNative": "1.7401",
+   "priceUsd": "1.74",
+   "txns": {
+    "m5": {
+     "buys": 2,
+     "sells": 1
+    },
+    "h1": {
+     "buys": 23,
+     "sells": 38
+    },
+    "h6": {
+     "buys": 197,
+     "sells": 189
+    },
+    "h24": {
+     "buys": 1269,
+     "sells": 1146
+    }
+   },
+   "volume": {
+    "h24": 24396.67,
+    "h6": 3137.93,
+    "h1": 593.18,
+    "m5": 30.2
+   },
+   "priceChange": {
+    "m5": 0.01,
+    "h1": 0.44,
+    "h6": 0.92,
+    "h24": -1.48
+   },
+   "liquidity": {
+    "usd": 208136.71,
+    "base": 113838,
+    "quote": 10042
+   },
+   "fdv": 629419615,
+   "marketCap": 629419615,
+   "pairCreatedAt": 1680526049000
+  },
+  {
+   "chainId": "bsc",
+   "dexId": "pancakeswap",
+   "url": "https://dexscreener.com/bsc/0xeb7528398b2725e1e0374734a87320132223a5c6",
+   "pairAddress": "0xEb7528398B2725E1E0374734a87320132223A5c6",
+   "labels": [
+    "v3"
+   ],
+   "baseToken": {
+    "address": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+    "name": "PancakeSwap Token",
+    "symbol": "Cake"
+   },
+   "quoteToken": {
+    "address": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+    "name": "Ethereum Token",
+    "symbol": "ETH"
+   },
+   "priceNative": "0.0008879",
+   "priceUsd": "1.74",
+   "txns": {
+    "m5": {
+     "buys": 0,
+     "sells": 0
+    },
+    "h1": {
+     "buys": 18,
+     "sells": 11
+    },
+    "h6": {
+     "buys": 115,
+     "sells": 87
+    },
+    "h24": {
+     "buys": 668,
+     "sells": 572
+    }
+   },
+   "volume": {
+    "h24": 21546.77,
+    "h6": 2488.06,
+    "h1": 400.51,
+    "m5": 0
+   },
+   "priceChange": {
+    "h1": 0.57,
+    "h6": 1.09,
+    "h24": -1.38
+   },
+   "liquidity": {
+    "usd": 139109.83,
+    "base": 5973.6833,
+    "quote": 65.6042
+   },
+   "fdv": 630120335,
+   "marketCap": 630120335,
+   "pairCreatedAt": 1685779618000
+  }
+ ]
+}

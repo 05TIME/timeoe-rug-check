@@ -63,3 +63,71 @@ describe("evaluate", () => {
     expect(r.reasons.join(" ")).not.toMatch(/\d/);
   });
 });
+
+describe("evaluate: multichain rules", () => {
+  const evm: Signals = {
+    chainFamily: "evm", honeypotSimulated: false, buyTax: 0, sellTax: 0, sourceVerified: true,
+    top10HolderShare: 0.2, liquidityUsd: 5000, poolAgeHours: 100, liquidityDropPct: 0, fdvUsd: 10000,
+  };
+  it("clean EVM token can PASS without Solana authority fields", () => {
+    expect(evaluate(evm, T).verdict).toBe("PASS");
+  });
+  it.each([
+    ["honeypotSimulated", true, /cannot be sold/],
+    ["cannotBuy", true, /blocks buying/],
+    ["sellTax", 0.6, /tax is extreme/],
+    ["buyTax", 0.5, /tax is extreme/],
+    ["sourceVerified", false, /not verified/],
+    ["ownerCanChangeBalance", true, /change holders' balances/],
+    ["selfDestruct", true, /self-destruct/],
+    ["nonTransferable", true, /cannot be transferred/],
+  ] as const)("EVM FAIL on %s", (k, v, re) => {
+    const r = evaluate({ ...evm, [k]: v }, T);
+    expect(r.verdict).toBe("FAIL");
+    expect(r.reasons.some((x) => re.test(x))).toBe(true);
+  });
+  it.each([
+    ["sellTax", 0.15, /tax is high/],
+    ["mintable", true, /mint more/],
+    ["proxy", true, /proxy/],
+    ["blacklist", true, /blacklist/],
+    ["pausable", true, /paused/],
+    ["hiddenOwner", true, /hidden owner/],
+    ["canTakeBackOwnership", true, /reclaimed/],
+    ["taxModifiable", true, /change the trading tax/],
+    ["tradingCooldown", true, /cooldown/],
+    ["cannotSellAll", true, /whole balance/],
+    ["creatorShare", 0.4, /creator wallet/],
+    ["honeypot", true, /possible honeypot/],
+  ] as const)("EVM CAUTION on %s", (k, v, re) => {
+    const s: Signals = { ...evm, [k]: v };
+    if (k === "honeypot") delete s.honeypotSimulated;
+    const r = evaluate(s, T);
+    expect(r.verdict).toBe("CAUTION");
+    expect(r.reasons.some((x) => re.test(x))).toBe(true);
+  });
+  it("unknown honeypot (no GoPlus) is CAUTION on EVM", () => {
+    const { honeypotSimulated, ...s } = evm;
+    expect(evaluate(s, T).reasons.join(" ")).toMatch(/Honeypot status is unknown/);
+  });
+  it("unlocked LP is a caution only while the pool is young", () => {
+    expect(evaluate({ ...evm, lpLockedShare: 0.1, poolAgeHours: 100 }, T).verdict).toBe("CAUTION");
+    expect(evaluate({ ...evm, lpLockedShare: 0.1, poolAgeHours: 5000 }, T).verdict).toBe("PASS");
+    expect(evaluate({ ...evm, lpLockedShare: 0.9, poolAgeHours: 100 }, T).verdict).toBe("PASS");
+  });
+  it("Solana Token-2022 extras", () => {
+    const sol: Signals = { ...clean };
+    expect(evaluate({ ...sol, balanceMutable: true }, T).verdict).toBe("FAIL");
+    expect(evaluate({ ...sol, transferHook: true }, T).verdict).toBe("CAUTION");
+    expect(evaluate({ ...sol, transferFee: true }, T).verdict).toBe("CAUTION");
+  });
+  it("EVM-only flags are ignored on Solana and vice versa", () => {
+    expect(evaluate({ ...clean, proxy: true, mintable: true }, T).verdict).toBe("PASS");
+    expect(evaluate({ ...evm, mintAuthorityActive: true, balanceMutable: true }, T).verdict).toBe("PASS");
+  });
+  it("thresholds are configurable and reasons still carry no numbers", () => {
+    expect(evaluate({ ...evm, sellTax: 0.3 }, { ...T, failTax: 0.25 }).verdict).toBe("FAIL");
+    const r = evaluate({ ...evm, sellTax: 0.9, honeypotSimulated: true, sourceVerified: false, creatorShare: 0.9 }, T);
+    expect(r.reasons.join(" ")).not.toMatch(/\d/);
+  });
+});

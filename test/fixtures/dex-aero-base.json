@@ -1,0 +1,83 @@
+[
+ {
+  "chainId": "base",
+  "dexId": "aerodrome",
+  "url": "https://dexscreener.com/base/0x6cdcb1c4a4d1c3c6d054b27ac5b77e89eafb971d",
+  "pairAddress": "0x6cDcb1C4A4D1C3C6d054b27AC5B77e89eAFb971d",
+  "baseToken": {
+   "address": "0x940181a94A35A4569E4529A3CDfB74e38FD98631",
+   "name": "Aerodrome",
+   "symbol": "AERO"
+  },
+  "quoteToken": {
+   "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+   "name": "USD Coin",
+   "symbol": "USDC"
+  },
+  "priceNative": "0.4805",
+  "priceUsd": "0.4805",
+  "txns": {
+   "m5": {
+    "buys": 0,
+    "sells": 6
+   },
+   "h1": {
+    "buys": 19,
+    "sells": 32
+   },
+   "h6": {
+    "buys": 189,
+    "sells": 226
+   },
+   "h24": {
+    "buys": 756,
+    "sells": 1075
+   }
+  },
+  "volume": {
+   "h24": 862663.6,
+   "h6": 173279.54,
+   "h1": 17595.81,
+   "m5": 1557.66
+  },
+  "priceChange": {
+   "m5": -0.16,
+   "h1": -0.54,
+   "h6": -2.65,
+   "h24": -7.93
+  },
+  "liquidity": {
+   "usd": 3955758.75,
+   "base": 4115580,
+   "quote": 1977879
+  },
+  "fdv": 965058059,
+  "marketCap": 132022163,
+  "pairCreatedAt": 1694127045000,
+  "info": {
+   "imageUrl": "https://cdn.dexscreener.com/cms/images/f950c4e0a9ded4f6b5c811cf33570a65c6f7ea8630d937cd69065269e9dc3a03?width=800&height=800&quality=95&format=auto",
+   "header": "https://cdn.dexscreener.com/cms/images/c16c2e02ffddde41226e2f5aeea4ac76f3e0a6234c362fef88572f5169772504?width=1500&height=500&quality=95&format=auto",
+   "openGraph": "https://cdn.dexscreener.com/token-images/og/base/0x940181a94a35a4569e4529a3cdfb74e38fd98631?timestamp=1794574500000",
+   "websites": [
+    {
+     "url": "https://aerodrome.finance/docs",
+     "label": "Website"
+    },
+    {
+     "url": "https://aerodrome.finance/docs",
+     "label": "Docs"
+    }
+   ],
+   "socials": [
+    {
+     "url": "https://x.com/aerodromefi",
+     "type": "twitter"
+    },
+    {
+     "url": "https://discord.gg/aerodrome",
+     "type": "discord"
+    }
+   ]
+  }
+ }
+]

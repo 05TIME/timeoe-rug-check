@@ -9,7 +9,7 @@ export const CLOUD_FALLBACK_MODEL = "gemini-3.5-flash-lite";
  * On-device hybrid inference does not support multi-turn chat, so follow-ups are
  * new single-turn prompts.
  */
-const RULES = "Explain a fixed Solana rug-check. Copy its verdict into verdictEcho. The model can never alter the verdict. Do not change it, invent facts, recommend a trade, or ask for a wallet or seed phrase. notAdvice is true. JSON only.";
+const RULES = "Explain a fixed token rug-check. Copy its verdict into verdictEcho. The model can never alter the verdict. Do not change it, invent facts, recommend a trade, or ask for a wallet or seed phrase. notAdvice is true. JSON only.";
 
 export const EXPLAIN_SYSTEM = `${RULES} Keys: verdictEcho, headline, plainEnglish, whyTheseReasons, whatYouCanDo, notAdvice.`;
 export const FOLLOW_SYSTEM = `${RULES} Keys: verdictEcho, answer, notAdvice.`;
@@ -25,6 +25,11 @@ export interface CheckSnapshot {
   reasons: string[];
   sources: { name: string; ok: boolean }[];
   checkedAt: string;
+  /** Same as mint; set for EVM tokens too. */
+  address?: string;
+  chain?: { name: string };
+  /** Short server-made fact lines (market, holders, contract flags). Facts only; the verdict stays fixed. */
+  facts?: string[];
 }
 
 export interface ExplanationFacts {
@@ -59,20 +64,43 @@ function sourceLine(check: CheckSnapshot): string {
   return clip(`Sources: ${check.sources.map((s) => `${s.name} ${s.ok ? "ok" : "unavailable"}`).join(", ")}`, 180);
 }
 
-function reasonBlock(check: CheckSnapshot): string {
-  return check.reasons.slice(0, 6).map((reason) => `- ${clip(reason, 100)}`).join("\n");
+/**
+ * Adds as many fact lines as fit in `budget` characters (including newlines).
+ * Facts are the lowest-priority part of the prompt, so they are dropped first.
+ */
+export function factBlock(check: CheckSnapshot, budget: number): string {
+  const facts = (check.facts ?? []).map((f) => clip(f, 90)).filter(Boolean);
+  if (!facts.length || budget < 20) return "";
+  const out: string[] = ["Facts:"];
+  let used = "Facts:".length;
+  for (const f of facts.slice(0, 10)) {
+    const line = `- ${f}`;
+    if (used + 1 + line.length > budget) break;
+    out.push(line); used += 1 + line.length;
+  }
+  return out.length > 1 ? out.join("\n") : "";
+}
+
+/**
+ * Assembles head + reasons + facts + tail within the on-device budget.
+ * Facts are dropped first, then the lowest-priority reasons, so the tail (sources or the question) survives.
+ */
+function withFacts(head: string[], check: CheckSnapshot, tail: string[]): string {
+  const reasons = check.reasons.slice(0, 6).map((reason) => `- ${clip(reason, 100)}`);
+  const join = (r: string[], facts = "") => [...head, "Reasons:", ...r, facts, ...tail].filter(Boolean).join("\n");
+  while (reasons.length > 1 && join(reasons).length > ON_DEVICE_USER_PROMPT_MAX) reasons.pop();
+  const facts = factBlock(check, ON_DEVICE_USER_PROMPT_MAX - join(reasons).length - 1);
+  return limitPrompt(join(reasons, facts));
 }
 
 export function buildExplanationPrompt(check: CheckSnapshot): string {
-  return limitPrompt([
+  return withFacts([
     `Verdict (fixed): ${check.verdict}`,
     "Do not change the verdict.",
     tokenLine(check),
-    `Mint: ${check.mint}`,
-    "Reasons:",
-    reasonBlock(check),
-    sourceLine(check),
-  ].join("\n"));
+    check.chain ? `Chain: ${clip(check.chain.name, 24)}` : "",
+    `Address: ${check.address ?? check.mint}`,
+  ], check, [sourceLine(check)]);
 }
 
 export function buildFollowUpPrompt(input: {
@@ -83,15 +111,14 @@ export function buildFollowUpPrompt(input: {
 }): string {
   const history = input.history.slice(-HISTORY_LIMIT).map((turn, i) =>
     `Q${i + 1}: ${clip(turn.question, 80)}\nA${i + 1}: ${clip(turn.answer, 100)}`).join("\n");
-  return limitPrompt([
+  return withFacts([
     "This is a single question, not a chat.",
     `Verdict (fixed): ${input.check.verdict}`,
     "Do not change the verdict.",
     tokenLine(input.check),
-    "Reasons:",
-    reasonBlock(input.check),
+  ], input.check, [
     `Accepted: ${clip(input.explanation.headline, 80)} ${clip(input.explanation.plainEnglish, 140)}`,
     history,
     `Question: ${clip(input.question.trim(), 160)}`,
-  ].filter(Boolean).join("\n"));
+  ]);
 }

@@ -1,0 +1,128 @@
+{
+ "code": 1,
+ "message": "OK",
+ "result": {
+  "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82": {
+   "anti_whale_modifiable": "0",
+   "can_take_back_ownership": "0",
+   "creator_address": "0x0f9399fc81dac77908a2dde54bb87ee2d17a3373",
+   "creator_balance": "0",
+   "creator_percent": "0.000000",
+   "external_call": "0",
+   "hidden_owner": "0",
+   "holder_count": "1905524",
+   "holders": [
+    {
+     "address": "0x000000000000000000000000000000000000dead",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "5475041228.881326202718699713",
+     "percent": "0.938028877534685772",
+     "is_locked": 1
+    },
+    {
+     "address": "0xf977814e90da44bfa03b6295a0616a897441acec",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "60000000",
+     "percent": "0.010279691110852286",
+     "is_locked": 0
+    },
+    {
+     "address": "0x5a52e96bacdabb82fd05763e25335261b270efcb",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "57038448.6182",
+     "percent": "0.009772293887288590",
+     "is_locked": 0
+    },
+    {
+     "address": "0xa5f8c5dbd5f286960b9d90548680ae5ebff07652",
+     "tag": "",
+     "is_contract": 1,
+     "balance": "24603796.840540142900412319",
+     "percent": "0.004215323861248601",
+     "is_locked": 0
+    },
+    {
+     "address": "0x45c54210128a065de780c4b0df3d16664f7f859e",
+     "tag": "",
+     "is_contract": 1,
+     "balance": "13374569.242837100737828165",
+     "percent": "0.002291440675951182",
+     "is_locked": 0
+    },
+    {
+     "address": "0x86ac3974e2bd0d60825230fa6f355ff11409df5c",
+     "tag": "",
+     "is_contract": 1,
+     "balance": "11625468.271263743128283098",
+     "percent": "0.001991770380793419",
+     "is_locked": 0
+    },
+    {
+     "address": "0xb274202daba6ae180c665b4fbe59857b7c3a8091",
+     "tag": "",
+     "is_contract": 1,
+     "balance": "9899961.515223583749276397",
+     "percent": "0.001696142439763726",
+     "is_locked": 0
+    },
+    {
+     "address": "0x73feaa1ee314f8c655e354234017be2193c9e24e",
+     "tag": "",
+     "is_contract": 1,
+     "balance": "7256596.137802562071539485",
+     "percent": "0.001243259446880233",
+     "is_locked": 0
+    },
+    {
+     "address": "0x0ee833adb865377dbba5e9e53fec5f2072c0d34e",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "6666680.30487",
+     "percent": "0.001142190237814435",
+     "is_locked": 0
+    },
+    {
+     "address": "0x91b3927f100bb6c19e5434bfaba07d60670b98d6",
+     "tag": "",
+     "is_contract": 1,
+     "balance": "5918898.088905528000201682",
+     "percent": "0.001014074067842712",
+     "is_locked": 0
+    }
+   ],
+   "honeypot_with_same_creator": "0",
+   "is_anti_whale": "0",
+   "is_blacklisted": "0",
+   "is_honeypot": "0",
+   "is_in_cex": {
+    "listed": "1",
+    "cex_list": [
+     "Binance"
+    ]
+   },
+   "is_in_dex": "1",
+   "is_mintable": "1",
+   "is_open_source": "1",
+   "is_proxy": "0",
+   "is_whitelisted": "0",
+   "owner_address": "0x73feaa1ee314f8c655e354234017be2193c9e24e",
+   "owner_balance": "7256596.137802562",
+   "owner_change_balance": "0",
+   "owner_percent": "0.001243",
+   "personal_slippage_modifiable": "0",
+   "selfdestruct": "0",
+   "slippage_modifiable": "0",
+   "token_name": "PancakeSwap Token",
+   "token_symbol": "Cake",
+   "total_supply": "5836751255.751051201610995531",
+   "trading_cooldown": "0",
+   "transfer_pausable": "0",
+   "transfer_tax": "",
+   "cannot_buy": "0",
+   "trust_list": "1"
+  }
+ }
+}
