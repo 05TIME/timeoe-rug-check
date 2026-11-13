@@ -9,6 +9,14 @@ export interface PublicResult {
 }
 export type Fetcher = (url: string, init?: RequestInit) => Promise<any>;
 
+/** A real account whose owner is not the Token or Token-2022 program. */
+export class NotATokenMintError extends Error {
+  constructor() {
+    super("That address is not a token mint.");
+    this.name = "NotATokenMintError";
+  }
+}
+
 const cache = new Map<string, { at: number; result: PublicResult }>();
 const snapshots = new Map<string, number>(); // mint -> last liquidity USD
 
@@ -48,9 +56,15 @@ export async function checkMint(mint: string, f: Fetcher = defaultFetch, now = D
 
   let supply: bigint | undefined;
   try { if (acct.status !== "fulfilled") throw 0; const a = p.parseMintAccount(acct.value);
-    if (!a.isMint) { return finish({ mint, verdict: "FAIL", reasons: ["No token exists at this address on Solana mainnet."], sources: [{ name: "Solana RPC", ok: true }], checkedAt: new Date(now).toISOString() }); }
+    if (!a.isMint) {
+      if (a.notTokenMint) throw new NotATokenMintError();
+      return finish({ mint, verdict: "FAIL", reasons: ["No token exists at this address on Solana mainnet."], sources: [{ name: "Solana RPC", ok: true }], checkedAt: new Date(now).toISOString() });
+    }
     s.mintAuthorityActive = a.mintAuthorityActive; s.freezeAuthorityActive = a.freezeAuthorityActive; supply = a.supply; mark("Solana RPC", true);
-  } catch { mark("Solana RPC", false, s.mintAuthorityActive === undefined); }
+  } catch (err) {
+    if (err instanceof NotATokenMintError) throw err;
+    mark("Solana RPC", false, s.mintAuthorityActive === undefined);
+  }
 
   // Top holders from RPC only if Gecko didn't provide it (public RPC often rate-limits this call).
   if (s.top10HolderShare === undefined && supply !== undefined) {

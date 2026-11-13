@@ -3,10 +3,21 @@ import type { Signals } from "../verdict";
 
 export interface TokenMeta { name?: string; symbol?: string }
 
-export function parseMintAccount(json: any): (Partial<Signals> & { supply?: bigint; isMint: boolean }) {
+/** SPL Token and Token-2022. Anything else at a real account is not a mint. */
+export const TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+export const TOKEN_2022_PROGRAM_ID = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
+
+export function isTokenProgram(owner: unknown): boolean {
+  return owner === TOKEN_PROGRAM_ID || owner === TOKEN_2022_PROGRAM_ID;
+}
+
+export function parseMintAccount(json: any): (Partial<Signals> & { supply?: bigint; isMint: boolean; notTokenMint?: boolean }) {
   const v = json?.result?.value;
   if (v === null) return { isMint: false };
+  const owner = v?.owner;
   const parsed = v?.data?.parsed;
+  if (typeof owner === "string" && !isTokenProgram(owner)) return { isMint: false, notTokenMint: true };
+  if (isTokenProgram(owner) && (!parsed || parsed.type !== "mint")) return { isMint: false, notTokenMint: true };
   if (!parsed || parsed.type !== "mint") throw new Error("not a mint");
   const info = parsed.info;
   return {

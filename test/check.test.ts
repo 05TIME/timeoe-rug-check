@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
-import { checkMint, _resetForTests, type Fetcher } from "../src/server/check";
+import { checkMint, _resetForTests, NotATokenMintError, type Fetcher } from "../src/server/check";
 import { allow } from "../src/server/ratelimit";
+import { GET } from "../app/api/check/route";
 
 const fx = (n: string) => JSON.parse(readFileSync(new URL(`./fixtures/${n}`, import.meta.url), "utf8"));
 const BONK = "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263";
@@ -66,6 +67,37 @@ describe("checkMint (fixtures, no network)", () => {
   it("address with no account is FAIL 'no token'", async () => {
     const r = await checkMint(BONK, fake({ getAccountInfo: { result: { value: null } } }), NOW);
     expect(r.verdict).toBe("FAIL"); expect(r.reasons[0]).toMatch(/No token exists/);
+  });
+  it("a real account that is not a Token or Token-2022 mint is not a token mint", async () => {
+    const system = { result: { value: { owner: "11111111111111111111111111111111", executable: true, lamports: 1, data: ["", "base64"] } } };
+    await expect(checkMint("11111111111111111111111111111111", fake({ getAccountInfo: system }), NOW)).rejects.toBeInstanceOf(NotATokenMintError);
+    const tokenAccount = fx("rpc-mint-bonk.json");
+    tokenAccount.result.value.data.parsed.type = "account";
+    await expect(checkMint(BONK, fake({ getAccountInfo: tokenAccount }), NOW + 61_000)).rejects.toMatchObject({ message: "That address is not a token mint." });
+  });
+  it("accepts a Token-2022 mint", async () => {
+    const acct = fx("rpc-mint-bonk.json");
+    acct.result.value.owner = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
+    const r = await checkMint(BONK, fake({ getAccountInfo: acct }), NOW + 122_000);
+    expect(r.verdict).toBe("CAUTION");
+    expect(r.symbol).toBe("Bonk");
+  });
+  it("returns HTTP 400 for the System Program address", async () => {
+    const previous = globalThis.fetch;
+    globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+      const body = init?.body ? String(init.body) : "";
+      if (body.includes("getAccountInfo")) {
+        return Response.json({ result: { value: { owner: "11111111111111111111111111111111", executable: true, lamports: 1, data: ["", "base64"] } } });
+      }
+      return new Response("no", { status: 404 });
+    }) as typeof fetch;
+    try {
+      const res = await GET(new Request("http://localhost/api/check?mint=11111111111111111111111111111111", { headers: { "x-forwarded-for": "system-program" } }));
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({ error: "That address is not a token mint." });
+    } finally {
+      globalThis.fetch = previous;
+    }
   });
 });
 
