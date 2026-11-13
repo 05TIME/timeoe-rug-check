@@ -19,6 +19,8 @@ export function thresholds(): Thresholds {
     maxCreatorShare: num("RC_MAX_CREATOR_SHARE", 0.2),
     minLpLockedShare: num("RC_MIN_LP_LOCKED", 0.5),
     lpLockCheckMaxAgeHours: num("RC_LP_LOCK_MAX_AGE_HOURS", 720),
+    deepLiquidityUsd: num("RC_DEEP_LIQUIDITY_USD", 500_000),
+    extremeFdvToLiquidity: num("RC_EXTREME_FDV_TO_LIQ", 1000),
   };
 }
 

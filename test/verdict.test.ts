@@ -21,15 +21,19 @@ describe("evaluate", () => {
     expect(r.verdict).toBe("FAIL");
     expect(r.reasons.some((x) => re.test(x))).toBe(true);
   });
-  it.each(["mintAuthorityActive", "freezeAuthorityActive", "honeypot", "top10HolderShare", "liquidityUsd", "poolAgeHours", "liquidityDropPct"] as const)(
+  it.each(["mintAuthorityActive", "freezeAuthorityActive", "honeypot", "top10HolderShare", "liquidityUsd", "poolAgeHours"] as const)(
     "unknown %s gives CAUTION at best", (k) => {
       const s = { ...clean }; delete (s as any)[k];
       expect(evaluate(s, T).verdict).toBe("CAUTION");
     });
-  it("unknown liquidity trend says 'trend unknown'", () => {
+  it("unknown liquidity trend (first check) is a note only and does not cause CAUTION", () => {
     const { liquidityDropPct, ...s } = clean;
-    expect(evaluate(s, T).reasons.join(" ")).toMatch(/trend unknown/);
+    const r = evaluate(s, T);
+    expect(r.verdict).toBe("PASS");
+    expect(r.reasons.join(" ")).not.toMatch(/trend/i);
+    expect(r.notes.join(" ")).toMatch(/first check/);
   });
+  it("a known trend adds no note", () => expect(evaluate(clean, T).notes).toEqual([]));
   it.each([
     ["honeypot", true, /possible honeypot/],
     ["top10HolderShare", 0.9, /large share/],
@@ -129,5 +133,33 @@ describe("evaluate: multichain rules", () => {
     expect(evaluate({ ...evm, sellTax: 0.3 }, { ...T, failTax: 0.25 }).verdict).toBe("FAIL");
     const r = evaluate({ ...evm, sellTax: 0.9, honeypotSimulated: true, sourceVerified: false, creatorShare: 0.9 }, T);
     expect(r.reasons.join(" ")).not.toMatch(/\d/);
+  });
+});
+
+describe("evaluate: thin-pool rule on total liquidity", () => {
+  const base: Signals = { ...clean, liquidityUsd: 100_000, poolAgeHours: 1000 };
+  const thin = /thin compared with the token's valuation/;
+  it("shallow total liquidity with a high FDV ratio is a CAUTION", () => {
+    const r = evaluate({ ...base, totalLiquidityUsd: 200_000, fdvUsd: 200_000 * 60 }, T);
+    expect(r.verdict).toBe("CAUTION"); expect(r.reasons.some((x) => thin.test(x))).toBe(true);
+  });
+  it("uses the sum of all pools, not just the main pool", () => {
+    expect(evaluate({ ...base, liquidityUsd: 100_000, totalLiquidityUsd: 400_000, fdvUsd: 10_000_000 }, T).verdict).toBe("PASS");
+    expect(evaluate({ ...base, liquidityUsd: 100_000, fdvUsd: 10_000_000 }, T).verdict).toBe("CAUTION");
+  });
+  it("USDC-like: deep total liquidity, FDV/liquidity in the hundreds, no thin-pool caution", () => {
+    const r = evaluate({ ...base, chainFamily: "evm", honeypotSimulated: false, sourceVerified: true, liquidityUsd: 135e6, totalLiquidityUsd: 222e6, fdvUsd: 46.7e9 }, T);
+    expect(r.verdict).toBe("PASS");
+  });
+  it("Bonk-like: about $1M across pools, FDV ratio ~230, no thin-pool caution", () => {
+    expect(evaluate({ ...base, liquidityUsd: 263_000, totalLiquidityUsd: 1_030_000, fdvUsd: 240e6 }, T).verdict).toBe("PASS");
+  });
+  it("deep liquidity still trips at an extreme ratio", () => {
+    const r = evaluate({ ...base, totalLiquidityUsd: 600_000, fdvUsd: 600_000 * 1500 }, T);
+    expect(r.reasons.some((x) => thin.test(x))).toBe(true);
+  });
+  it("thresholds are configurable", () => {
+    expect(evaluate({ ...base, totalLiquidityUsd: 600_000, fdvUsd: 600_000 * 300 }, { ...T, extremeFdvToLiquidity: 200 }).verdict).toBe("CAUTION");
+    expect(evaluate({ ...base, totalLiquidityUsd: 600_000, fdvUsd: 600_000 * 300 }, { ...T, deepLiquidityUsd: 1e6 }).verdict).toBe("CAUTION");
   });
 });

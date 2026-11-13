@@ -30,6 +30,7 @@ function Report({ res }: { res: Result }) {
             <Row k="24h change" v={m.priceChange24hPct === undefined ? "unavailable" : `${m.priceChange24hPct}%`} />
             <Row k="Market cap" v={usd(m.marketCapUsd)} />
             <Row k="Fully diluted value" v={usd(m.fdvUsd)} />
+            <Row k="Liquidity (all pools)" v={usd(m.totalLiquidityUsd)} />
             <Row k="Liquidity (main pool)" v={usd(m.liquidityUsd)} />
             <Row k="24h volume" v={usd(m.volume24hUsd)} />
             <Row k="24h trades" v={m.buys24h === undefined ? "unavailable" : `${count(m.buys24h)} buys / ${count(m.sells24h)} sells`} />
@@ -129,6 +130,7 @@ export default function Page() {
           {(res.name || res.symbol) && <h2>{res.name}{res.symbol ? ` (${res.symbol})` : ""}</h2>}
           <p className="mint">{res.address ?? res.mint}</p>
           <ul>{res.reasons.map((r) => <li key={r}>{r}</li>)}</ul>
+          {res.notes?.length ? <ul className="notes">{res.notes.map((n) => <li key={n} className="small">Note: {n}</li>)}</ul> : null}
           <p className="small">Sources: {res.sources.map((s, i) => (
             <span key={s.name}>{i > 0 && ", "}{s.url && s.ok ? <a href={s.url} target="_blank" rel="noopener noreferrer nofollow">{s.name}</a> : s.name}{s.ok ? "" : " (unavailable)"}</span>
           ))}</p>

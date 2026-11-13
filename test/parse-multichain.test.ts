@@ -21,6 +21,12 @@ describe("parseDexMarket", () => {
     expect(m.websites[0].url).toMatch(/circle\.com/);
     expect(m.poolAgeHours).toBeGreaterThan(0);
   });
+  it("sums liquidity across every pool", () => {
+    const pairs = fx("dex-usdc-eth.json");
+    const sum = pairs.reduce((a: number, x: any) => a + x.liquidity.usd, 0);
+    expect(p.parseDexMarket(pairs, USDC, NOW).totalLiquidityUsd).toBeCloseTo(sum);
+    expect(p.totalLiquidity([{}, { liquidity: {} }])).toBeUndefined();
+  });
   it("AERO on Base and CAKE on BNB Chain", () => {
     const a = p.parseDexMarket(fx("dex-aero-base.json"), AERO, NOW);
     expect(a.dex).toBe("aerodrome"); expect(a.quoteSymbol).toBe("USDC");

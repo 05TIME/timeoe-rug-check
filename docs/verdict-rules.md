@@ -29,10 +29,18 @@ Thresholds can be tuned with the `RC_*` env vars in `src/server/config.ts` (defa
 | Main-pool liquidity < $25k (`RC_MIN_LIQUIDITY_USD`) | all | DexScreener | FAIL (none found: CAUTION) |
 | Main pool < 48 h old (`RC_MIN_POOL_AGE_HOURS`) | all | DexScreener | FAIL (unknown: CAUTION) |
 | LP locked/burned < 50% while pool < 30 days (`RC_MIN_LP_LOCKED`, `RC_LP_LOCK_MAX_AGE_HOURS`) | EVM v2-style pools | GoPlus `lp_holders` | CAUTION |
-| Liquidity dropped > 30% since last check (`RC_MAX_LIQUIDITY_DROP`) | all | in-memory snapshot | FAIL (no snapshot: CAUTION) |
-| FDV / liquidity > 50 (`RC_WARN_FDV_TO_LIQ`) | all | DexScreener | CAUTION |
+| Total liquidity dropped > 30% since last check (`RC_MAX_LIQUIDITY_DROP`) | all | in-memory snapshot | FAIL (first check, no snapshot: **note only**, no effect on the verdict) |
+| Thin pools: FDV / **total** liquidity across all of the token's pools > 50 (`RC_WARN_FDV_TO_LIQ`) while total liquidity < $500k (`RC_DEEP_LIQUIDITY_USD`); or > 1,000 (`RC_EXTREME_FDV_TO_LIQ`) at any depth | all | DexScreener (sum of up to 30 pools on that chain) | CAUTION |
 | RugCheck danger-level risk | Solana | RugCheck.xyz | CAUTION each |
 | A critical source unavailable | all | — | CAUTION |
+
+Why the thin-pool rule has two tiers: large tokens trade mostly on centralized exchanges, so their on-chain pools are
+small next to their valuation (live on 2026-11-13: USDC ≈ 210×, Bonk ≈ 230×, ARB ≈ 460× FDV-to-total-liquidity) even though
+hundreds of thousands to millions of dollars of liquidity can absorb ordinary trades. Below $500k of total liquidity the
+ratio is what matters, so the original 50× threshold applies there.
+
+Notes are informational lines returned next to the reasons (for example "Liquidity trend not tracked yet (first check)").
+They never change the verdict.
 
 Critical sources: Solana RPC, GeckoTerminal and DexScreener on Solana; GoPlus and DexScreener on EVM chains.
 GoPlus (Solana) and RugCheck are non-critical extras. Hard fails are listed before cautions; at most six reasons are shown,

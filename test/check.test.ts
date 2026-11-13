@@ -24,11 +24,13 @@ function fake(over: Record<string, any> = {}): Fetcher & { calls: string[] } {
 beforeEach(() => _resetForTests());
 
 describe("checkMint (fixtures, no network)", () => {
-  it("BONK first check is CAUTION with trend unknown and all sources ok", async () => {
+  it("BONK first check: trend is a note, no thin-pool caution, all sources ok", async () => {
     const r = await checkMint(BONK, fake(), NOW);
-    expect(r.verdict).toBe("CAUTION");
+    expect(r.verdict).toBe("CAUTION"); // GeckoTerminal reports honeypot status as unknown for Bonk
+    expect(r.reasons).toEqual(["Honeypot status is unknown."]);
+    expect(r.notes?.join(" ")).toMatch(/first check/);
+    expect(r.report?.market?.totalLiquidityUsd).toBeGreaterThan(r.report!.market!.liquidityUsd!);
     expect(r.symbol).toBe("Bonk");
-    expect(r.reasons.join(" ")).toMatch(/trend unknown/);
     expect(r.sources.every((s) => s.ok)).toBe(true);
     expect(JSON.stringify(r)).not.toMatch(/score|threshold|minLiquidity/i);
     expect(r.chain).toEqual({ key: "solana", name: "Solana", family: "solana" });

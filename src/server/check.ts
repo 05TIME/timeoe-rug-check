@@ -12,6 +12,8 @@ export interface PublicResult {
   chain: { key: ChainKey; name: string; family: ChainFamily };
   name?: string; symbol?: string;
   verdict: Verdict; reasons: string[]; sources: SourceStatus[]; checkedAt: string;
+  /** Informational notes that did not affect the verdict. */
+  notes?: string[];
   report?: Report;
   /** Short summarized facts for the optional AI explanation. Never used for the verdict. */
   facts?: string[];
@@ -92,11 +94,13 @@ export async function checkToken(input: { address: string; chain?: ChainKey }, f
   throw new Error("invalid address");
 }
 
+/** Liquidity trend vs the previous check, on total pool liquidity (falls back to the main pool). */
 function trend(key: string, s: Signals) {
-  if (s.liquidityUsd === undefined) return;
+  const liq = s.totalLiquidityUsd ?? s.liquidityUsd;
+  if (liq === undefined) return;
   const prev = snapshots.get(key);
-  if (prev !== undefined && prev > 0) s.liquidityDropPct = Math.max(0, (prev - s.liquidityUsd) / prev);
-  snapshots.set(key, s.liquidityUsd);
+  if (prev !== undefined && prev > 0) s.liquidityDropPct = Math.max(0, (prev - liq) / prev);
+  snapshots.set(key, liq);
 }
 
 function links(chain: ChainKey, address: string, market: p.MarketInfo | null): Report["links"] {
@@ -148,7 +152,7 @@ export async function checkMint(mint: string, f: Fetcher = defaultFetch, now = D
   try { if (acct.status !== "fulfilled") throw 0; const a = p.parseMintAccount(acct.value);
     if (!a.isMint) {
       if (a.notTokenMint) throw new NotATokenMintError();
-      return finish({ mint, address: mint, chain, verdict: "FAIL", reasons: ["No token exists at this address on Solana mainnet."], sources: [{ name: "Solana RPC", ok: true }], checkedAt: new Date(now).toISOString() });
+      return finish({ mint, address: mint, chain, verdict: "FAIL", reasons: ["No token exists at this address on Solana mainnet."], notes: [], sources: [{ name: "Solana RPC", ok: true }], checkedAt: new Date(now).toISOString() });
     }
     s.mintAuthorityActive = a.mintAuthorityActive; s.freezeAuthorityActive = a.freezeAuthorityActive; supply = a.supply; decimals = a.decimals; mark("Solana RPC", true);
   } catch (err) {
@@ -163,7 +167,7 @@ export async function checkMint(mint: string, f: Fetcher = defaultFetch, now = D
 
   try { if (dex.status !== "fulfilled") throw 0; market = p.parseDexMarket(dex.value, mint, now);
     const d = p.parseDexScreener(dex.value, now);
-    meta.name ??= d.name; meta.symbol ??= d.symbol; s.liquidityUsd = d.liquidityUsd; s.poolAgeHours = d.poolAgeHours; s.fdvUsd = d.fdvUsd;
+    meta.name ??= d.name; meta.symbol ??= d.symbol; s.liquidityUsd = d.liquidityUsd; s.totalLiquidityUsd = d.totalLiquidityUsd; s.poolAgeHours = d.poolAgeHours; s.fdvUsd = d.fdvUsd;
     mark("DexScreener", true, true, `https://dexscreener.com/solana/${mint}`);
   } catch { mark("DexScreener", false); }
 
@@ -272,7 +276,7 @@ export async function checkEvm(address: string, hint: EvmChainKey | undefined, f
   } catch { mark("GoPlus", false); }
 
   try { if (dex.status !== "fulfilled") throw 0; market = p.parseDexMarket(dex.value, address, now);
-    s.liquidityUsd = market.liquidityUsd; s.poolAgeHours = market.poolAgeHours; s.fdvUsd = market.fdvUsd;
+    s.liquidityUsd = market.liquidityUsd; s.totalLiquidityUsd = market.totalLiquidityUsd; s.poolAgeHours = market.poolAgeHours; s.fdvUsd = market.fdvUsd;
     mark("DexScreener", true, true, `https://dexscreener.com/${c.dexId}/${address}`);
   } catch { mark("DexScreener", false); }
 

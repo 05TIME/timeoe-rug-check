@@ -7,6 +7,7 @@
  *          cannot buy, extreme tax, owner can rewrite balances, self-destruct, unverified
  *          EVM source, non-transferable, low liquidity, very new pool, sharp liquidity drop).
  *  CAUTION — no FAIL but at least one soft flag or unknown signal.
+ *  Notes (e.g. first check, no liquidity trend yet) are informational and never change the verdict.
  *  PASS  — every core signal known and clean. Never worded as "safe".
  */
 export type Verdict = "PASS" | "CAUTION" | "FAIL";
@@ -52,7 +53,10 @@ export interface Signals {
   creatorShare?: number; // 0..1
   lpLockedShare?: number; // 0..1 of LP tokens locked or burned (v2-style pools only)
 
+  /** Main (deepest) pool liquidity. Used for the low-liquidity FAIL. */
   liquidityUsd?: number;
+  /** Sum of liquidity across all of the token's pools on this chain. Used for the thin-pool CAUTION. */
+  totalLiquidityUsd?: number;
   poolAgeHours?: number;
   liquidityDropPct?: number; // 0..1 vs previous snapshot; undefined = trend unknown
   fdvUsd?: number;
@@ -76,11 +80,17 @@ export interface Thresholds {
   minLpLockedShare?: number;
   /** Pools younger than this many hours get the unlocked-LP caution. Default 720 (30 days). */
   lpLockCheckMaxAgeHours?: number;
+  /** Total pool liquidity at or above this is deep enough that the FDV/liquidity ratio alone is not a caution. Default 500,000. */
+  deepLiquidityUsd?: number;
+  /** FDV / total liquidity above this is a caution even when liquidity is deep. Default 1,000. */
+  extremeFdvToLiquidity?: number;
 }
 
 export interface VerdictResult {
   verdict: Verdict;
   reasons: string[];
+  /** Informational context. Never affects the verdict. */
+  notes: string[];
 }
 
 const MAX_REASONS = 6;
@@ -88,6 +98,7 @@ const MAX_REASONS = 6;
 export function evaluate(s: Signals, t: Thresholds): VerdictResult {
   const fails: string[] = [];
   const cautions: string[] = [];
+  const notes: string[] = [];
   const evm = s.chainFamily === "evm";
   const failTax = t.failTax ?? 0.5;
   const warnTax = t.warnTax ?? 0.1;
@@ -148,11 +159,19 @@ export function evaluate(s: Signals, t: Thresholds): VerdictResult {
     && s.poolAgeHours !== undefined && s.poolAgeHours < (t.lpLockCheckMaxAgeHours ?? 720))
     cautions.push("Most pool liquidity is not locked or burned, so it could be pulled.");
 
-  if (s.liquidityDropPct === undefined) cautions.push("Liquidity trend unknown (no earlier snapshot yet).");
+  // First check: no earlier snapshot to compare. Informational only; a real drop is still a FAIL.
+  if (s.liquidityDropPct === undefined) notes.push("Liquidity trend not tracked yet (first check). A sharp drop on a later check is a fail.");
   else if (s.liquidityDropPct > t.maxLiquidityDropPct) fails.push("Liquidity has dropped sharply since the last check.");
 
-  if (s.fdvUsd !== undefined && s.liquidityUsd && s.fdvUsd / s.liquidityUsd > t.warnFdvToLiquidity)
-    cautions.push("The pool is thin compared with the token's valuation.");
+  // Thin pool: valuation vs liquidity summed across all pools. Deep total liquidity only trips it at an extreme ratio,
+  // because large tokens trade mostly on exchanges and their on-chain pools are small next to their valuation.
+  const poolLiq = s.totalLiquidityUsd ?? s.liquidityUsd;
+  if (s.fdvUsd !== undefined && poolLiq) {
+    const ratio = s.fdvUsd / poolLiq;
+    const deep = poolLiq >= (t.deepLiquidityUsd ?? 500_000);
+    if (deep ? ratio > (t.extremeFdvToLiquidity ?? 1000) : ratio > t.warnFdvToLiquidity)
+      cautions.push("Pool liquidity is thin compared with the token's valuation.");
+  }
 
   for (const f of s.externalDangerFlags ?? []) cautions.push(`Second-opinion source flags: ${f}.`);
   for (const src of s.unavailableSources ?? []) cautions.push(`${src} was unavailable, so this check is incomplete.`);
@@ -161,5 +180,5 @@ export function evaluate(s: Signals, t: Thresholds): VerdictResult {
   const reasons = verdict === "PASS"
     ? ["No red flags found in the data available. This does not mean the token is safe."]
     : [...fails, ...cautions].slice(0, MAX_REASONS);
-  return { verdict, reasons };
+  return { verdict, reasons, notes };
 }

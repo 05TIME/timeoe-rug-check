@@ -64,7 +64,7 @@ export function aiFacts(chainName: string, m: MarketInfo | null, s: Signals, hol
   const facts = [`Chain: ${chainName}`];
   if (m && m.pairs > 0) {
     if (m.priceUsd !== undefined) facts.push(`Price ${usd(m.priceUsd)}${m.priceChange24hPct !== undefined ? ` (${m.priceChange24hPct}% 24h)` : ""}`);
-    facts.push(`Liquidity ${usd(m.liquidityUsd)}, 24h volume ${usd(m.volume24hUsd)}`);
+    facts.push(`Liquidity ${usd(m.totalLiquidityUsd ?? m.liquidityUsd)}, 24h volume ${usd(m.volume24hUsd)}`);
     if (m.marketCapUsd !== undefined || m.fdvUsd !== undefined) facts.push(`Market cap ${usd(m.marketCapUsd ?? m.fdvUsd)}`);
     if (m.poolAgeHours !== undefined) facts.push(`Main pool age ${age(m.poolAgeHours)}`);
   } else facts.push("No trading pools found");

@@ -51,6 +51,12 @@ export function parseGecko(json: any): Partial<Signals> & TokenMeta {
   };
 }
 
+/** Sum of pool liquidity in USD; undefined when no pool reports it. */
+export function totalLiquidity(pairs: any[]): number | undefined {
+  const vals = pairs.map((p) => p?.liquidity?.usd).filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+  return vals.length ? vals.reduce((a, b) => a + b, 0) : undefined;
+}
+
 /** Uses the deepest pool for liquidity / age / FDV. */
 export function parseDexScreener(json: any, nowMs: number): Partial<Signals> & TokenMeta & { pairs: number } {
   if (!Array.isArray(json)) throw new Error("bad response");
@@ -60,6 +66,7 @@ export function parseDexScreener(json: any, nowMs: number): Partial<Signals> & T
     pairs: json.length,
     name: best.baseToken?.name, symbol: best.baseToken?.symbol,
     liquidityUsd: typeof best.liquidity?.usd === "number" ? best.liquidity.usd : undefined,
+    totalLiquidityUsd: totalLiquidity(json),
     poolAgeHours: typeof best.pairCreatedAt === "number" ? (nowMs - best.pairCreatedAt) / 3_600_000 : undefined,
     fdvUsd: typeof best.fdv === "number" ? best.fdv : undefined,
   };
@@ -76,6 +83,8 @@ export function parseRugCheck(json: any): string[] {
 export interface LinkItem { label: string; url: string }
 export interface MarketInfo {
   pairs: number;
+  /** Sum of liquidity over every pool returned for this token on this chain (DexScreener returns up to 30). */
+  totalLiquidityUsd?: number;
   priceUsd?: number;
   priceChange24hPct?: number;
   liquidityUsd?: number;
@@ -128,6 +137,7 @@ export function parseDexMarket(json: any, address: string, nowMs: number): Marke
   const created = num(best.pairCreatedAt);
   return {
     pairs: list.length,
+    totalLiquidityUsd: totalLiquidity(list),
     priceUsd: asBase ? num(best.priceUsd) : undefined,
     priceChange24hPct: asBase ? num(best.priceChange?.h24) : undefined,
     liquidityUsd: num(best.liquidity?.usd),

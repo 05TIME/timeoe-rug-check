@@ -79,7 +79,9 @@ describe("checkEvm (fixtures, no network)", () => {
     const r = await checkToken({ address: USDC }, fake(), NOW);
     expect(r.chain).toEqual({ key: "ethereum", name: "Ethereum", family: "evm" });
     expect(r).toMatchObject({ name: "USD Coin", symbol: "USDC", verdict: "CAUTION" });
-    expect(r.reasons.join(" ")).toMatch(/upgradeable proxy/);
+    // Upgradeable proxy is a real caution; first-check trend and thin-pool are not.
+    expect(r.reasons).toEqual(["This is an upgradeable proxy, so the code can be changed later."]);
+    expect(r.notes?.join(" ")).toMatch(/first check/);
     expect(r.reasons.join(" ")).not.toMatch(/mint authority|freeze authority/i);
     expect(r.report?.token).toMatchObject({ decimals: 6, trusted: true });
     expect(r.report?.token.totalSupply).toMatch(/^44,/);
@@ -90,6 +92,13 @@ describe("checkEvm (fixtures, no network)", () => {
     expect(r.sources.every((s) => s.ok)).toBe(true);
     expect(r.facts).toContain("Chain: Ethereum");
     expect(JSON.stringify(r)).not.toMatch(/score|threshold|minLiquidity/i);
+  });
+  it("USDC-like token without the proxy flag is PASS on its first check", async () => {
+    const gp = fx("goplus-usdc-eth.json");
+    gp.result[USDC.toLowerCase()].is_proxy = "0";
+    const r = await checkEvm(USDC, "ethereum", fake({ goplus: gp }), NOW);
+    expect(r.verdict).toBe("PASS");
+    expect(r.notes?.join(" ")).toMatch(/first check/);
   });
   it("synthetic honeypot is a FAIL listing the hard flags first", async () => {
     const f = fake({ goplus: fx("goplus-honeypot-synthetic.json"), search: { pairs: null }, pairs: [], code: { bsc: rpcFx.eth_getCode, ethereum: rpcFx.noCode } });
