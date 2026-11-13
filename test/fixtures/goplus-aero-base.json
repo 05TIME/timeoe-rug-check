@@ -1,0 +1,230 @@
+{
+ "code": 1,
+ "message": "OK",
+ "result": {
+  "0x940181a94a35a4569e4529a3cdfb74e38fd98631": {
+   "anti_whale_modifiable": "0",
+   "buy_tax": "0",
+   "can_take_back_ownership": "0",
+   "cannot_buy": "0",
+   "cannot_sell_all": "0",
+   "creator_address": "0xe83f922C34A1962e9aE9F52B59e18239764f2818",
+   "creator_balance": "0",
+   "creator_percent": "0.000000",
+   "external_call": "0",
+   "hidden_owner": "0",
+   "holder_count": "734541",
+   "holders": [
+    {
+     "address": "0xebf418fe2512e7e6bd9b87a8f0f294acdc67e6b4",
+     "tag": "",
+     "is_contract": 1,
+     "balance": "1733412654.331160941985441314",
+     "percent": "0.863210676013685546",
+     "is_locked": 0
+    },
+    {
+     "address": "0xf977814e90da44bfa03b6295a0616a897441acec",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "18000000",
+     "percent": "0.008963700668402938",
+     "is_locked": 0
+    },
+    {
+     "address": "0x5a52e96bacdabb82fd05763e25335261b270efcb",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "15610185.00186",
+     "percent": "0.007773612540837000",
+     "is_locked": 0
+    },
+    {
+     "address": "0x841ed663f2636863d40be4ee76243377dff13a34",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "14873466.250843473059897758",
+     "percent": "0.007406738854119677",
+     "is_locked": 0
+    },
+    {
+     "address": "0xfde6f4427ee1e4d639ffb04f4656c1b59af7ee59",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "8653282.251007704634315712",
+     "percent": "0.004309190660957613",
+     "is_locked": 0
+    },
+    {
+     "address": "0xf35a6bd6e0459a4b53a27862c51a2a7292b383d1",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "7187878.667587836572598272",
+     "percent": "0.003579444045392017",
+     "is_locked": 0
+    },
+    {
+     "address": "0xc5ab86a7dfdd03ba397e2ea53bb7f95fdc262acd",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "5505016.20379499522241665",
+     "percent": "0.002741406523640344",
+     "is_locked": 0
+    },
+    {
+     "address": "0x657563f4f3384d7a5518ff413a6d20252308f557",
+     "tag": "",
+     "is_contract": 0,
+     "balance": "5249813.493520865498761521",
+     "percent": "0.002614319817825763",
+     "is_locked": 0
+    },
+    {
+     "address": "0x416ec2ca21a38cbcfeacd6a14532b3f348356d23",
+     "tag": "",
+     "is_contract": 1,
+     "balance": "4513016.232226972842312026",
+     "percent": "0.002247407034295901",
+     "is_locked": 0
+    },
+    {
+     "address": "0x6cdcb1c4a4d1c3c6d054b27ac5b77e89eafb971d",
+     "tag": "",
+     "is_contract": 1,
+     "balance": "4109883.21527487354861573",
+     "percent": "0.002046653495767633",
+     "is_locked": 0
+    }
+   ],
+   "honeypot_with_same_creator": "0",
+   "is_anti_whale": "0",
+   "is_blacklisted": "0",
+   "is_honeypot": "0",
+   "is_in_cex": {
+    "listed": "1",
+    "cex_list": [
+     "Coinbase"
+    ]
+   },
+   "is_in_dex": "1",
+   "is_mintable": "1",
+   "is_open_source": "1",
+   "is_proxy": "0",
+   "is_whitelisted": "0",
+   "lp_holder_count": "157",
+   "lp_holders": [
+    {
+     "address": "0x00bd3219b5cfe7d951b6a8df0ba0d0b1ad00c55c",
+     "tag": "",
+     "value": "95588.8104809055864076296",
+     "is_contract": 0,
+     "balance": "26281.426398429497274944",
+     "percent": "0.452276595622753877",
+     "NFT_list": [
+      {
+       "value": "95588.8104809055864076296",
+       "NFT_id": "6097330",
+       "amount": "26281.426398429497274944",
+       "in_effect": "1",
+       "NFT_percentage": "0.452276595622753877"
+      }
+     ],
+     "is_locked": 0
+    },
+    {
+     "address": "0x6fda6f746366b66a1aedd4fae34cba12c217ca9a",
+     "tag": "",
+     "value": "39045.3960618574479792225",
+     "is_contract": 0,
+     "balance": "22934.901682248180850544",
+     "percent": "0.184742531230959486",
+     "NFT_list": [
+      {
+       "value": "39045.3960618574479792225",
+       "NFT_id": "6325193",
+       "amount": "22934.901682248180850544",
+       "in_effect": "1",
+       "NFT_percentage": "0.184742531230959486"
+      }
+     ],
+     "is_locked": 0
+    },
+    {
+     "address": "0xa547a35176fb8f8744f69c999c808c97a4efde22",
+     "tag": "",
+     "value": "11954.0260883532059734149",
+     "is_contract": 0,
+     "balance": "7824.249402573559510861",
+     "percent": "0.056560241685463362",
+     "NFT_list": [
+      {
+       "value": "11954.0260883532059734149",
+       "NFT_id": "6117589",
+       "amount": "7824.249402573559510861",
+       "in_effect": "1",
+       "NFT_percentage": "0.056560241685463362"
+      }
+     ],
+     "is_locked": 0
+    },
+    {
+     "address": "0x934cb47920b47df9b646a9662ffc7838e787123d",
+     "tag": "",
+     "value": "11044.978644177197886852",
+     "is_contract": 1,
+     "balance": "7229.25204608167732236",
+     "percent": "0.052259101403007205",
+     "NFT_list": [
+      {
+       "value": "7404.282410408800011852",
+       "NFT_id": "6563487",
+       "amount": "4846.313016044943899282",
+       "in_effect": "1",
+       "NFT_percentage": "0.035033218059325772"
+      },
+      {
+       "value": "3640.696233768397875",
+       "NFT_id": "6563478",
+       "amount": "2382.939030036733423078",
+       "in_effect": "1",
+       "NFT_percentage": "0.017225883343681433"
+      }
+     ],
+     "is_locked": 0
+    },
+    {
+     "address": "0x4c2b7ca8759951709df9b1afbc6c2782d4f35a75",
+     "tag": "",
+     "value": "10826.2409231255815604892",
+     "is_contract": 0,
+     "balance": "3535.243733824750676361",
+     "percent": "0.051224148134797361",
+     "NFT_list": [
+      {
+       "value": "10826.2409231255815604892",
+       "NFT_id": "6097118",
+       "amount": "3535.243733824750676361",
+       "in_effect": "1",
+       "NFT_percentage": "0.051224148134797361"
+      }
+     ],
+     "is_locked": 0
+    }
+   ],
+   "lp_total_supply": "82926.85752787367",
+   "owner_balance": "0",
+   "owner_change_balance": "0",
+   "owner_percent": "0",
+   "personal_slippage_modifiable": "0",
+   "selfdestruct": "0",
+   "sell_tax": "0",
+   "slippage_modifiable": "0",
+   "token_name": "Aerodrome",
+   "token_symbol": "AERO",
+   "total_supply": "2008099184.240950012933563166",
+   "trading_cooldown": "0",
+   "transfer_pausable": "0",
+   "transfer_tax": "0"
+  }
+ }
+}

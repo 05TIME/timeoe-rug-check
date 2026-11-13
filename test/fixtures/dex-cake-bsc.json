@@ -1,0 +1,61 @@
+[
+ {
+  "chainId": "bsc",
+  "dexId": "pancakeswap",
+  "url": "https://dexscreener.com/bsc/0xafb2da14056725e3ba3a30dd846b6bbbd7886c56",
+  "pairAddress": "0xAfB2Da14056725E3BA3a30dD846B6BBbd7886c56",
+  "labels": [
+   "v3"
+  ],
+  "baseToken": {
+   "address": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+   "name": "PancakeSwap Token",
+   "symbol": "Cake"
+  },
+  "quoteToken": {
+   "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+   "name": "Wrapped BNB",
+   "symbol": "WBNB"
+  },
+  "priceNative": "0.002716",
+  "priceUsd": "1.74",
+  "txns": {
+   "m5": {
+    "buys": 9,
+    "sells": 3
+   },
+   "h1": {
+    "buys": 84,
+    "sells": 147
+   },
+   "h6": {
+    "buys": 444,
+    "sells": 554
+   },
+   "h24": {
+    "buys": 2971,
+    "sells": 3021
+   }
+  },
+  "volume": {
+   "h24": 1178091.7,
+   "h6": 163769.97,
+   "h1": 26022.48,
+   "m5": 2711.42
+  },
+  "priceChange": {
+   "m5": -0.07,
+   "h1": 0.46,
+   "h6": 0.91,
+   "h24": -1.48
+  },
+  "liquidity": {
+   "usd": 818734.57,
+   "base": 268727,
+   "quote": 548.1757
+  },
+  "fdv": 629399861,
+  "marketCap": 629399861,
+  "pairCreatedAt": 1680528785000
+ }
+]

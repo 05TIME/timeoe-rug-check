@@ -1,0 +1,333 @@
+{
+ "schemaVersion": "1.0.0",
+ "pairs": [
+  {
+   "chainId": "pulsechain",
+   "dexId": "pulsex",
+   "url": "https://dexscreener.com/pulsechain/0x2db5ef4e8a7dbe195defae2d9b79948096a03274",
+   "pairAddress": "0x2dB5EF4E8A7Dbe195defAe2d9b79948096a03274",
+   "labels": [
+    "v2"
+   ],
+   "baseToken": {
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "name": "USD Coin",
+    "symbol": "USDC"
+   },
+   "quoteToken": {
+    "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    "name": "Dai Stablecoin",
+    "symbol": "DAI"
+   },
+   "priceNative": "0.4424",
+   "priceUsd": "0.0005332",
+   "txns": {
+    "m5": {
+     "buys": 0,
+     "sells": 0
+    },
+    "h1": {
+     "buys": 0,
+     "sells": 0
+    },
+    "h6": {
+     "buys": 12,
+     "sells": 1
+    },
+    "h24": {
+     "buys": 87,
+     "sells": 73
+    }
+   },
+   "volume": {
+    "h24": 1576.73,
+    "h6": 81.63,
+    "h1": 0,
+    "m5": 0
+   },
+   "priceChange": {
+    "h6": 1.62,
+    "h24": 4.37
+   },
+   "liquidity": {
+    "usd": 28715.47,
+    "base": 26926401,
+    "quote": 11912442
+   },
+   "fdv": 15184867,
+   "marketCap": 15184867,
+   "pairCreatedAt": 1685651445000
+  },
+  {
+   "chainId": "pulsechain",
+   "dexId": "pulsex",
+   "url": "https://dexscreener.com/pulsechain/0xc636bfe0bae34824380b4e26bc34e4614e55e483",
+   "pairAddress": "0xC636bfE0bAe34824380B4E26Bc34e4614e55e483",
+   "labels": [
+    "v1"
+   ],
+   "baseToken": {
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "name": "USD Coin",
+    "symbol": "USDC"
+   },
+   "quoteToken": {
+    "address": "0xCc78A0acDF847A2C1714D2A925bB4477df5d48a6",
+    "name": "Atropa",
+    "symbol": "ATROPA"
+   },
+   "priceNative": "0.02169",
+   "priceUsd": "0.0005346",
+   "txns": {
+    "m5": {
+     "buys": 0,
+     "sells": 0
+    },
+    "h1": {
+     "buys": 1,
+     "sells": 0
+    },
+    "h6": {
+     "buys": 4,
+     "sells": 0
+    },
+    "h24": {
+     "buys": 337,
+     "sells": 232
+    }
+   },
+   "volume": {
+    "h24": 5615.73,
+    "h6": 104.64,
+    "h1": 9.37,
+    "m5": 0
+   },
+   "priceChange": {
+    "h1": 0.39,
+    "h6": 1.38,
+    "h24": 4.99
+   },
+   "liquidity": {
+    "usd": 4316222.86,
+    "base": 4036346067,
+    "quote": 87559050
+   },
+   "fdv": 15226103,
+   "marketCap": 15226103,
+   "pairCreatedAt": 1685325445000
+  },
+  {
+   "chainId": "ethereum",
+   "dexId": "uniswap",
+   "url": "https://dexscreener.com/ethereum/0x2b21c65d9a7dc6926ee330a1c6e5a8037fd81774f3dc066536f800128e39f634",
+   "pairAddress": "0x2b21c65d9a7dc6926ee330a1c6e5a8037fd81774f3dc066536f800128e39f634",
+   "labels": [
+    "v4"
+   ],
+   "baseToken": {
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "name": "USD Coin",
+    "symbol": "USDC"
+   },
+   "quoteToken": {
+    "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    "name": "Tether USD",
+    "symbol": "USDT"
+   },
+   "priceNative": "1.0006959",
+   "priceUsd": "1.00069",
+   "txns": {
+    "m5": {
+     "buys": 4,
+     "sells": 3
+    },
+    "h1": {
+     "buys": 70,
+     "sells": 56
+    },
+    "h6": {
+     "buys": 337,
+     "sells": 341
+    },
+    "h24": {
+     "buys": 1423,
+     "sells": 1409
+    }
+   },
+   "volume": {
+    "h24": 96413342.93,
+    "h6": 9826616.86,
+    "h1": 1270228.7,
+    "m5": 20780.04
+   },
+   "priceChange": {
+    "h6": -0.01,
+    "h24": -0.03
+   },
+   "liquidity": {
+    "usd": 6919837,
+    "base": 4679732,
+    "quote": 2236847
+   },
+   "fdv": 44654603741,
+   "marketCap": 69465801819,
+   "pairCreatedAt": 1789051187000,
+   "info": {
+    "imageUrl": "https://cdn.dexscreener.com/cms/images/https%3A%2F%2Fcoin-images.coingecko.com%2Fcoins%2Fimages%2F6319%2Flarge%2FUSDC.png%3F1769615602?width=800&height=800&quality=95&format=auto",
+    "openGraph": "https://cdn.dexscreener.com/token-images/og/ethereum/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48?timestamp=1794574500000",
+    "websites": [
+     {
+      "url": "https://www.circle.com/en/usdc",
+      "label": "circle.com"
+     }
+    ],
+    "socials": [
+     {
+      "url": "https://discord.com/invite/buildoncircle",
+      "type": "discord"
+     }
+    ]
+   }
+  },
+  {
+   "chainId": "ethereum",
+   "dexId": "uniswap",
+   "url": "https://dexscreener.com/ethereum/0x0fb0e40cec3bb23e13abc585958a93c796fbea56955e19a23727a716a0423239",
+   "pairAddress": "0x0fb0e40cec3bb23e13abc585958a93c796fbea56955e19a23727a716a0423239",
+   "labels": [
+    "v4"
+   ],
+   "baseToken": {
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "name": "USD Coin",
+    "symbol": "USDC"
+   },
+   "quoteToken": {
+    "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    "name": "Tether USD",
+    "symbol": "USDT"
+   },
+   "priceNative": "1.0006868",
+   "priceUsd": "1.00068",
+   "txns": {
+    "m5": {
+     "buys": 5,
+     "sells": 0
+    },
+    "h1": {
+     "buys": 51,
+     "sells": 41
+    },
+    "h6": {
+     "buys": 374,
+     "sells": 313
+    },
+    "h24": {
+     "buys": 1429,
+     "sells": 1296
+    }
+   },
+   "volume": {
+    "h24": 40564653.98,
+    "h6": 2197548.79,
+    "h1": 376815.66,
+    "m5": 5414.66
+   },
+   "priceChange": {
+    "h6": -0.01,
+    "h24": -0.03
+   },
+   "liquidity": {
+    "usd": 3027587,
+    "base": 1543169,
+    "quote": 1483357
+   },
+   "fdv": 44654197806,
+   "marketCap": 69465170336,
+   "pairCreatedAt": 1747108055000,
+   "info": {
+    "imageUrl": "https://cdn.dexscreener.com/cms/images/https%3A%2F%2Fcoin-images.coingecko.com%2Fcoins%2Fimages%2F6319%2Flarge%2FUSDC.png%3F1769615602?width=800&height=800&quality=95&format=auto",
+    "openGraph": "https://cdn.dexscreener.com/token-images/og/ethereum/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48?timestamp=1794574500000",
+    "websites": [
+     {
+      "url": "https://www.circle.com/en/usdc",
+      "label": "circle.com"
+     }
+    ],
+    "socials": [
+     {
+      "url": "https://discord.com/invite/buildoncircle",
+      "type": "discord"
+     }
+    ]
+   }
+  },
+  {
+   "chainId": "ethereum",
+   "dexId": "metric",
+   "url": "https://dexscreener.com/ethereum/0xaef2ad7abb651945e6d24276715f25bded0ad41e",
+   "pairAddress": "0xaef2ad7aBB651945e6D24276715f25BDED0ad41e",
+   "baseToken": {
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "name": "USDC",
+    "symbol": "USDC"
+   },
+   "quoteToken": {
+    "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    "name": "Tether USDt",
+    "symbol": "USDT"
+   },
+   "priceNative": "1.0006881",
+   "priceUsd": "1.00",
+   "txns": {
+    "m5": {
+     "buys": 5,
+     "sells": 5
+    },
+    "h1": {
+     "buys": 85,
+     "sells": 54
+    },
+    "h6": {
+     "buys": 411,
+     "sells": 386
+    },
+    "h24": {
+     "buys": 1123,
+     "sells": 1012
+    }
+   },
+   "volume": {
+    "h24": 146780934.64,
+    "h6": 50256714.21,
+    "h1": 8847442.01,
+    "m5": 363426.48
+   },
+   "priceChange": {},
+   "liquidity": {
+    "usd": 4492907.72,
+    "base": 1943067,
+    "quote": 2551594
+   },
+   "fdv": 44660757022,
+   "marketCap": 69417488693,
+   "pairCreatedAt": 1792030691000,
+   "info": {
+    "imageUrl": "https://cdn.dexscreener.com/cms/images/https%3A%2F%2Fcoin-images.coingecko.com%2Fcoins%2Fimages%2F6319%2Flarge%2FUSDC.png%3F1769615602?width=800&height=800&quality=95&format=auto",
+    "openGraph": "https://cdn.dexscreener.com/token-images/og/ethereum/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48?timestamp=1794574500000",
+    "websites": [
+     {
+      "url": "https://www.circle.com/en/usdc",
+      "label": "circle.com"
+     }
+    ],
+    "socials": [
+     {
+      "url": "https://discord.com/invite/buildoncircle",
+      "type": "discord"
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,287 @@
+[
+ {
+  "chainId": "ethereum",
+  "dexId": "uniswap",
+  "url": "https://dexscreener.com/ethereum/0x2b21c65d9a7dc6926ee330a1c6e5a8037fd81774f3dc066536f800128e39f634",
+  "pairAddress": "0x2b21c65d9a7dc6926ee330a1c6e5a8037fd81774f3dc066536f800128e39f634",
+  "labels": [
+   "v4"
+  ],
+  "baseToken": {
+   "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+   "name": "USD Coin",
+   "symbol": "USDC"
+  },
+  "quoteToken": {
+   "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+   "name": "Tether USD",
+   "symbol": "USDT"
+  },
+  "priceNative": "1.0006959",
+  "priceUsd": "1.00069",
+  "txns": {
+   "m5": {
+    "buys": 4,
+    "sells": 2
+   },
+   "h1": {
+    "buys": 70,
+    "sells": 56
+   },
+   "h6": {
+    "buys": 337,
+    "sells": 341
+   },
+   "h24": {
+    "buys": 1423,
+    "sells": 1409
+   }
+  },
+  "volume": {
+   "h24": 96413342.93,
+   "h6": 9826616.86,
+   "h1": 1270228.7,
+   "m5": 20714.74
+  },
+  "priceChange": {
+   "h6": -0.01,
+   "h24": -0.03
+  },
+  "liquidity": {
+   "usd": 6919837,
+   "base": 4680057,
+   "quote": 2236521
+  },
+  "fdv": 44654603741,
+  "marketCap": 69465801819,
+  "pairCreatedAt": 1789051187000,
+  "info": {
+   "imageUrl": "https://cdn.dexscreener.com/cms/images/https%3A%2F%2Fcoin-images.coingecko.com%2Fcoins%2Fimages%2F6319%2Flarge%2FUSDC.png%3F1769615602?width=800&height=800&quality=95&format=auto",
+   "openGraph": "https://cdn.dexscreener.com/token-images/og/ethereum/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48?timestamp=1794574800000",
+   "websites": [
+    {
+     "url": "https://www.circle.com/en/usdc",
+     "label": "circle.com"
+    }
+   ],
+   "socials": [
+    {
+     "url": "https://discord.com/invite/buildoncircle",
+     "type": "discord"
+    }
+   ]
+  }
+ },
+ {
+  "chainId": "ethereum",
+  "dexId": "uniswap",
+  "url": "https://dexscreener.com/ethereum/0x0fb0e40cec3bb23e13abc585958a93c796fbea56955e19a23727a716a0423239",
+  "pairAddress": "0x0fb0e40cec3bb23e13abc585958a93c796fbea56955e19a23727a716a0423239",
+  "labels": [
+   "v4"
+  ],
+  "baseToken": {
+   "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+   "name": "USD Coin",
+   "symbol": "USDC"
+  },
+  "quoteToken": {
+   "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+   "name": "Tether USD",
+   "symbol": "USDT"
+  },
+  "priceNative": "1.0006869",
+  "priceUsd": "1.00068",
+  "txns": {
+   "m5": {
+    "buys": 5,
+    "sells": 0
+   },
+   "h1": {
+    "buys": 52,
+    "sells": 39
+   },
+   "h6": {
+    "buys": 375,
+    "sells": 311
+   },
+   "h24": {
+    "buys": 1428,
+    "sells": 1296
+   }
+  },
+  "volume": {
+   "h24": 40548803.86,
+   "h6": 2192408.14,
+   "h1": 376765.6,
+   "m5": 5432.61
+  },
+  "priceChange": {
+   "h6": -0.01,
+   "h24": -0.03
+  },
+  "liquidity": {
+   "usd": 3027587.04,
+   "base": 1543169,
+   "quote": 1483357
+  },
+  "fdv": 44654198966,
+  "marketCap": 69465172141,
+  "pairCreatedAt": 1747108055000,
+  "info": {
+   "imageUrl": "https://cdn.dexscreener.com/cms/images/https%3A%2F%2Fcoin-images.coingecko.com%2Fcoins%2Fimages%2F6319%2Flarge%2FUSDC.png%3F1769615602?width=800&height=800&quality=95&format=auto",
+   "openGraph": "https://cdn.dexscreener.com/token-images/og/ethereum/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48?timestamp=1794574800000",
+   "websites": [
+    {
+     "url": "https://www.circle.com/en/usdc",
+     "label": "circle.com"
+    }
+   ],
+   "socials": [
+    {
+     "url": "https://discord.com/invite/buildoncircle",
+     "type": "discord"
+    }
+   ]
+  }
+ },
+ {
+  "chainId": "ethereum",
+  "dexId": "metric",
+  "url": "https://dexscreener.com/ethereum/0xaef2ad7abb651945e6d24276715f25bded0ad41e",
+  "pairAddress": "0xaef2ad7aBB651945e6D24276715f25BDED0ad41e",
+  "baseToken": {
+   "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+   "name": "USDC",
+   "symbol": "USDC"
+  },
+  "quoteToken": {
+   "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+   "name": "Tether USDt",
+   "symbol": "USDT"
+  },
+  "priceNative": "1.0006821",
+  "priceUsd": "1.00",
+  "txns": {
+   "m5": {
+    "buys": 4,
+    "sells": 7
+   },
+   "h1": {
+    "buys": 82,
+    "sells": 54
+   },
+   "h6": {
+    "buys": 404,
+    "sells": 364
+   },
+   "h24": {
+    "buys": 1090,
+    "sells": 985
+   }
+  },
+  "volume": {
+   "h24": 141156993.13,
+   "h6": 46317644.28,
+   "h1": 8649327.77,
+   "m5": 299519.53
+  },
+  "priceChange": {},
+  "liquidity": {
+   "usd": 4492923.03,
+   "base": 1943073,
+   "quote": 2551589
+  },
+  "fdv": 44660757022,
+  "marketCap": 69417488693,
+  "pairCreatedAt": 1792030691000,
+  "info": {
+   "imageUrl": "https://cdn.dexscreener.com/cms/images/https%3A%2F%2Fcoin-images.coingecko.com%2Fcoins%2Fimages%2F6319%2Flarge%2FUSDC.png%3F1769615602?width=800&height=800&quality=95&format=auto",
+   "openGraph": "https://cdn.dexscreener.com/token-images/og/ethereum/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48?timestamp=1794574800000",
+   "websites": [
+    {
+     "url": "https://www.circle.com/en/usdc",
+     "label": "circle.com"
+    }
+   ],
+   "socials": [
+    {
+     "url": "https://discord.com/invite/buildoncircle",
+     "type": "discord"
+    }
+   ]
+  }
+ },
+ {
+  "chainId": "ethereum",
+  "dexId": "uniswap",
+  "url": "https://dexscreener.com/ethereum/0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+  "pairAddress": "0x3416cF6C708Da44DB2624D63ea0AAef7113527C6",
+  "labels": [
+   "v3"
+  ],
+  "baseToken": {
+   "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+   "name": "USD Coin",
+   "symbol": "USDC"
+  },
+  "quoteToken": {
+   "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+   "name": "Tether USD",
+   "symbol": "USDT"
+  },
+  "priceNative": "1.0007434",
+  "priceUsd": "1.00074",
+  "txns": {
+   "m5": {
+    "buys": 2,
+    "sells": 5
+   },
+   "h1": {
+    "buys": 26,
+    "sells": 30
+   },
+   "h6": {
+    "buys": 272,
+    "sells": 140
+   },
+   "h24": {
+    "buys": 1082,
+    "sells": 751
+   }
+  },
+  "volume": {
+   "h24": 24162612.31,
+   "h6": 1764948.72,
+   "h1": 259358.28,
+   "m5": 90172.83
+  },
+  "priceChange": {
+   "h24": -0.02
+  },
+  "liquidity": {
+   "usd": 33612562.05,
+   "base": 8823783,
+   "quote": 24782218
+  },
+  "fdv": 44783915482,
+  "marketCap": 69469097534,
+  "pairCreatedAt": 1636825557000,
+  "info": {
+   "imageUrl": "https://cdn.dexscreener.com/cms/images/https%3A%2F%2Fcoin-images.coingecko.com%2Fcoins%2Fimages%2F6319%2Flarge%2FUSDC.png%3F1769615602?width=800&height=800&quality=95&format=auto",
+   "openGraph": "https://cdn.dexscreener.com/token-images/og/ethereum/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48?timestamp=1794574800000",
+   "websites": [
+    {
+     "url": "https://www.circle.com/en/usdc",
+     "label": "circle.com"
+    }
+   ],
+   "socials": [
+    {
+     "url": "https://discord.com/invite/buildoncircle",
+     "type": "discord"
+    }
+   ]
+  }
+ }
+]

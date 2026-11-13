@@ -1,13 +1,19 @@
 # TIMEŒ Rug Check
 
-A free, read-only Solana token rug-check. Paste a mint address, get a plain PASS / CAUTION / FAIL verdict with reasons.
+A free, read-only multichain token rug-check. Paste a Solana mint or a 0x token contract (Ethereum, BNB Chain, Base, Arbitrum, Polygon, Optimism, Avalanche) and get a plain PASS / CAUTION / FAIL verdict with reasons, plus a report: price, market cap, liquidity, volume, pool age, holders, top-10 share, taxes, honeypot simulation, owner powers and source links.
 
 **Not financial advice.** It never asks for a wallet, seed phrase or keys.
 
 ## How it works
 - `src/verdict`: pure, dependency-free verdict package. Signals in, PASS / CAUTION / FAIL plus plain reasons out. Unknown data is never treated as safe.
-- `src/server`: server-only fetchers (Solana public RPC, GeckoTerminal, DexScreener, RugCheck free summary), a 60s per-mint cache, an in-memory liquidity snapshot, and a per-IP rate limit. Thresholds come from env vars (`RC_*`) with defaults in `src/server/config.ts`.
-- `app/`: Next.js page and `GET /api/check?mint=…`. Responses contain only the verdict, reasons, sources and a timestamp.
+- `src/chains`: chain registry and address detection. `0x` + 40 hex is EVM; base58 that decodes to 32 bytes is Solana.
+- `src/server`: server-only fetchers, a 60s per-token cache, an in-memory liquidity snapshot, and a per-IP rate limit. Thresholds come from env vars (`RC_*`) with defaults in `src/server/config.ts`. Every external call has a 7s timeout (`RC_FETCH_TIMEOUT_MS`); a failed source is shown as unavailable and never crashes the check.
+  - Solana: public RPC (mint/freeze authority, Token/Token-2022 owner check), GeckoTerminal, DexScreener, GoPlus Solana token security, RugCheck.xyz summary.
+  - EVM: chain auto-detection (DexScreener pools across chains, confirmed with `eth_getCode`; if no pools, `eth_getCode` on every supported chain), ERC-20 `name/symbol/decimals/totalSupply` via `eth_call` on keyless public RPCs (publicnode with official fallbacks), GoPlus token security, DexScreener market data. An address with no contract code, or whose `totalSupply()` reverts, returns HTTP 400 "That address is not a token contract."
+- `app/`: Next.js page and `GET /api/check?address=…&chain=…` (`chain` optional, `mint=` still accepted). Responses contain the verdict, reasons, sources (with links), the report sections, and short fact lines for the explanation.
+- Verdict rules: see [`docs/verdict-rules.md`](docs/verdict-rules.md).
+
+No API keys are needed. Optional env vars: `EVM_RPC_URL_<CHAIN>` (e.g. `EVM_RPC_URL_ETHEREUM`) to use your own RPC, `GOPLUS_ACCESS_TOKEN` for higher GoPlus rate limits, `SOLANA_RPC_URL`.
 - `src/ai`: optional plain-English explanation. It runs in the browser after the verdict and cannot replace it.
 
 Read-only: no wallet connection, no signing, no keys, no analytics.
