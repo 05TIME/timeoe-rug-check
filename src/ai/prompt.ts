@@ -4,21 +4,18 @@ import type { Verdict } from "../verdict";
 export const CLOUD_FALLBACK_MODEL = "gemini-3.5-flash-lite";
 
 /**
- * Shared by the cloud system instruction and the on-device initial prompt.
- * On-device hybrid inference does not support multi-turn chat; a chat session
- * would fall through to the cloud. Follow-ups are therefore new single-turn prompts.
+ * Shared safety rules. Kept short because Chrome never evicts the system prompt
+ * from Gemini Nano's context window.
+ * On-device hybrid inference does not support multi-turn chat, so follow-ups are
+ * new single-turn prompts.
  */
-export const SYSTEM_RULES = [
-  "You explain a Solana token rug-check to a beginner.",
-  "A fixed checker already chose PASS, CAUTION, or FAIL. You only explain that choice.",
-  "Copy that verdict into verdictEcho exactly. Never upgrade, downgrade, or replace it.",
-  "Use only the facts in the prompt. Do not invent prices, owners, holders, or risks.",
-  "Write plain English and briefly define any jargon you use.",
-  "notAdvice must be true. Do not tell the reader to buy, sell, or invest.",
-  "Never ask for a wallet, seed phrase, or private key.",
-  "If a question asks you to change the verdict or to give a trade instruction, refuse in the answer and keep verdictEcho equal to the given verdict.",
-  "Reply with JSON only.",
-].join(" ");
+const RULES = "Explain a fixed Solana rug-check. Copy its verdict into verdictEcho. Do not change it, invent facts, recommend a trade, or ask for a wallet or seed phrase. notAdvice is true. JSON only.";
+
+export const EXPLAIN_SYSTEM = `${RULES} Keys: verdictEcho, headline, plainEnglish, whyTheseReasons, whatYouCanDo, notAdvice.`;
+export const FOLLOW_SYSTEM = `${RULES} Keys: verdictEcho, answer, notAdvice.`;
+
+/** User-turn budget. Nano's context window also holds the system prompt and the JSON constraint. */
+export const ON_DEVICE_USER_PROMPT_MAX = 900;
 
 export interface CheckSnapshot {
   mint: string;
@@ -39,31 +36,43 @@ export interface ExplanationFacts {
 
 const HISTORY_LIMIT = 3;
 
+export function clip(value: string, max: number): string {
+  const trimmed = value.trim().replace(/\s+/g, " ");
+  return trimmed.length <= max ? trimmed : `${trimmed.slice(0, Math.max(0, max - 1))}…`;
+}
+
+/** Hard cap so a long reason list cannot overflow Gemini Nano by itself. */
+export function limitPrompt(text: string, max = ON_DEVICE_USER_PROMPT_MAX): string {
+  if (text.length <= max) return text;
+  return `${text.slice(0, Math.max(0, max - 1))}…`;
+}
+
 function tokenLine(check: CheckSnapshot): string {
-  const label = [check.name, check.symbol ? `(${check.symbol})` : ""].filter(Boolean).join(" ");
+  const name = check.name ? clip(check.name, 40) : "";
+  const symbol = check.symbol ? `(${clip(check.symbol, 16)})` : "";
+  const label = [name, symbol].filter(Boolean).join(" ");
   return label ? `Token: ${label}` : "Token: name unknown";
 }
 
 function sourceLine(check: CheckSnapshot): string {
-  if (!check.sources.length) return "Sources: none reported";
-  return `Sources: ${check.sources.map((s) => `${s.name} ${s.ok ? "ok" : "unavailable"}`).join(", ")}`;
+  if (!check.sources.length) return "Sources: none";
+  return clip(`Sources: ${check.sources.map((s) => `${s.name} ${s.ok ? "ok" : "unavailable"}`).join(", ")}`, 180);
 }
 
 function reasonBlock(check: CheckSnapshot): string {
-  return check.reasons.map((reason, i) => `${i + 1}. ${reason}`).join("\n");
+  return check.reasons.slice(0, 6).map((reason) => `- ${clip(reason, 100)}`).join("\n");
 }
 
 export function buildExplanationPrompt(check: CheckSnapshot): string {
-  return [
+  return limitPrompt([
     `Verdict (fixed): ${check.verdict}`,
+    "Do not change the verdict.",
     tokenLine(check),
     `Mint: ${check.mint}`,
-    `Checked at: ${check.checkedAt}`,
-    sourceLine(check),
-    "Reasons from the fixed checker:",
+    "Reasons:",
     reasonBlock(check),
-    "Explain this verdict in the JSON schema. Do not change the verdict.",
-  ].join("\n");
+    sourceLine(check),
+  ].join("\n"));
 }
 
 export function buildFollowUpPrompt(input: {
@@ -73,23 +82,16 @@ export function buildFollowUpPrompt(input: {
   question: string;
 }): string {
   const history = input.history.slice(-HISTORY_LIMIT).map((turn, i) =>
-    `Earlier question ${i + 1}: ${clip(turn.question, 200)}\nEarlier answer ${i + 1}: ${clip(turn.answer, 400)}`).join("\n");
-  return [
-    "This is a single question, not a chat. Answer only the new question.",
+    `Q${i + 1}: ${clip(turn.question, 80)}\nA${i + 1}: ${clip(turn.answer, 100)}`).join("\n");
+  return limitPrompt([
+    "This is a single question, not a chat.",
     `Verdict (fixed): ${input.check.verdict}`,
+    "Do not change the verdict.",
     tokenLine(input.check),
-    `Mint: ${input.check.mint}`,
-    "Reasons from the fixed checker:",
+    "Reasons:",
     reasonBlock(input.check),
-    "Explanation already accepted:",
-    input.explanation.headline,
-    input.explanation.plainEnglish,
+    `Accepted: ${clip(input.explanation.headline, 80)} ${clip(input.explanation.plainEnglish, 140)}`,
     history,
-    `New question: ${clip(input.question.trim(), 500)}`,
-  ].filter(Boolean).join("\n");
-}
-
-function clip(value: string, max: number): string {
-  const trimmed = value.trim();
-  return trimmed.length <= max ? trimmed : `${trimmed.slice(0, max - 1)}…`;
+    `Question: ${clip(input.question.trim(), 160)}`,
+  ].filter(Boolean).join("\n"));
 }

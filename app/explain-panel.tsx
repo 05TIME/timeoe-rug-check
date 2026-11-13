@@ -21,6 +21,7 @@ interface ThreadItem {
   question: string;
   answer: string;
   path: AnswerPath;
+  fallbackReason?: "input-too-large";
 }
 
 export default function ExplainPanel({ result }: { result: CheckSnapshot }) {
@@ -36,6 +37,7 @@ export default function ExplainPanel({ result }: { result: CheckSnapshot }) {
   const [progress, setProgress] = useState<number | null>(null);
   const [explanation, setExplanation] = useState<Explanation | null>(null);
   const [path, setPath] = useState<AnswerPath | null>(null);
+  const [fallbackReason, setFallbackReason] = useState<"input-too-large" | undefined>();
   const [error, setError] = useState("");
   const [question, setQuestion] = useState("");
   const [thread, setThread] = useState<ThreadItem[]>([]);
@@ -91,6 +93,7 @@ export default function ExplainPanel({ result }: { result: CheckSnapshot }) {
       if (!outcome.ok) { setError(outcome.message); return; }
       setExplanation(outcome.explanation);
       setPath(outcome.path);
+      setFallbackReason(outcome.fallbackReason);
     } finally {
       busyRef.current = false;
       if (live.current) { setPhase("idle"); setProgress(null); }
@@ -114,7 +117,7 @@ export default function ExplainPanel({ result }: { result: CheckSnapshot }) {
       });
       if (!live.current) return;
       if (!outcome.ok) { setError(outcome.message); return; }
-      setThread((prev) => [...prev, { question: question.trim(), answer: outcome.answer, path: outcome.path }]);
+      setThread((prev) => [...prev, { question: question.trim(), answer: outcome.answer, path: outcome.path, fallbackReason: outcome.fallbackReason }]);
       setQuestion("");
     } finally {
       busyRef.current = false;
@@ -139,7 +142,7 @@ export default function ExplainPanel({ result }: { result: CheckSnapshot }) {
       {explanation && path && (
         <div aria-live="polite">
           <p className={`path ${path}`}>{pathLabel(path)}</p>
-          <p className="small">{pathDetail(path)}</p>
+          <p className="small">{pathDetail(path, fallbackReason)}</p>
           <h3>{explanation.headline}</h3>
           <p>{explanation.plainEnglish}</p>
           <ul>{explanation.whyTheseReasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
@@ -154,7 +157,7 @@ export default function ExplainPanel({ result }: { result: CheckSnapshot }) {
             <li key={`${index}-${item.question}`}>
               <p><strong>You asked: </strong>{item.question}</p>
               <p>{item.answer}</p>
-              <p className="small">{pathLabel(item.path)}. {pathDetail(item.path)}</p>
+              <p className="small">{pathLabel(item.path)}. {pathDetail(item.path, item.fallbackReason)}</p>
             </li>
           ))}
         </ul>

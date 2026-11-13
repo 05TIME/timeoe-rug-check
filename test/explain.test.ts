@@ -1,9 +1,9 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { appCheckMode, readFirebasePublicConfig } from "../src/ai/config";
-import { answerFollowUp, classifyModelError, downloadPercent, explainVerdict, mapInferenceSource, prepareQuestion, settingsFromRemote, type Explainer, type ModelTurn } from "../src/ai/explain";
-import { buildExplanationPrompt, buildFollowUpPrompt, type CheckSnapshot } from "../src/ai/prompt";
+import { buildExplanationPrompt, buildFollowUpPrompt, EXPLAIN_SYSTEM, FOLLOW_SYSTEM, ON_DEVICE_USER_PROMPT_MAX, type CheckSnapshot } from "../src/ai/prompt";
 import { acceptExplanation, acceptFollowUp, readModelJson } from "../src/ai/schema";
+import { answerFollowUp, classifyModelError, contextWouldOverflow, downloadPercent, explainVerdict, isInputTooLarge, mapInferenceSource, pathDetail, prepareQuestion, settingsFromRemote, withOnDeviceFallback, type Explainer, type ModelTurn } from "../src/ai/explain";
 
 const check: CheckSnapshot = {
   mint: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
@@ -185,6 +185,12 @@ describe("follow-up questions", () => {
     expect(prompt).not.toContain("QuestionNumber1");
     expect(prompt).not.toContain("QuestionNumber2");
     expect(buildExplanationPrompt(check)).toContain("DexScreener ok");
+    expect(buildExplanationPrompt(check).length).toBeLessThanOrEqual(ON_DEVICE_USER_PROMPT_MAX);
+    expect(EXPLAIN_SYSTEM.length).toBeLessThan(400);
+    expect(FOLLOW_SYSTEM.length).toBeLessThan(400);
+    const huge = buildExplanationPrompt({ ...check, reasons: Array.from({ length: 6 }, () => "x".repeat(5000)) });
+    expect(huge.length).toBeLessThanOrEqual(ON_DEVICE_USER_PROMPT_MAX);
+    expect(huge.startsWith("Verdict (fixed): CAUTION")).toBe(true);
   });
   it("refuses a secret request without calling the model", async () => {
     let called = false;
@@ -222,6 +228,79 @@ describe("follow-up questions", () => {
   });
 });
 
+describe("Gemini Nano input limit", () => {
+  const quotaError = Object.assign(new Error("The input is too large."), { name: "QuotaExceededError", code: 22 });
+  const deviceText = body();
+  const cloudText = body({ headline: "Cloud explained the same caution." });
+
+  it("recognizes Chrome's QuotaExceededError and a context window that is too small", () => {
+    expect(isInputTooLarge(quotaError)).toBe(true);
+    expect(isInputTooLarge({ name: "QuotaExceededError", message: "The input is too large.", code: 22 })).toBe(true);
+    expect(isInputTooLarge(new Error("App Check permission-denied"))).toBe(false);
+    expect(contextWouldOverflow(1200, 1024)).toBe(true);
+    expect(contextWouldOverflow(40, -8)).toBe(true);
+    expect(contextWouldOverflow(40, 1024)).toBe(false);
+  });
+
+  it("keeps the on-device answer when the prompt fits", async () => {
+    let device = 0;
+    let cloud = 0;
+    const turn = await withOnDeviceFallback({
+      measure: async () => ({ usage: 40, windowSize: 1024 }),
+      runOnDevice: async () => { device += 1; return { text: deviceText, inferenceSource: "ON_DEVICE" }; },
+      runInCloud: async () => { cloud += 1; return { text: cloudText, inferenceSource: "IN_CLOUD" }; },
+    });
+    expect(device).toBe(1);
+    expect(cloud).toBe(0);
+    expect(turn).toMatchObject({ inferenceSource: "ON_DEVICE", text: deviceText });
+    expect(turn.fallbackReason).toBeUndefined();
+  });
+
+  it("uses the cloud model when measurement says the prompt does not fit", async () => {
+    let device = 0;
+    let cloud = 0;
+    const turn = await withOnDeviceFallback({
+      measure: async () => ({ usage: 5000, windowSize: 1024 }),
+      runOnDevice: async () => { device += 1; return { text: deviceText, inferenceSource: "ON_DEVICE" }; },
+      runInCloud: async () => { cloud += 1; return { text: cloudText, inferenceSource: "IN_CLOUD" }; },
+    });
+    expect(device).toBe(0);
+    expect(cloud).toBe(1);
+    expect(turn).toMatchObject({ inferenceSource: "IN_CLOUD", fallbackReason: "input-too-large", text: cloudText });
+  });
+
+  it("falls back to the cloud model when Nano throws QuotaExceededError", async () => {
+    let device = 0;
+    let cloud = 0;
+    const turn = await withOnDeviceFallback({
+      measure: async () => null,
+      runOnDevice: async () => { device += 1; throw quotaError; },
+      runInCloud: async () => { cloud += 1; return { text: cloudText, inferenceSource: "UNKNOWN" }; },
+    });
+    expect(device).toBe(1);
+    expect(cloud).toBe(1);
+    expect(turn.inferenceSource).toBe("IN_CLOUD");
+    expect(turn.fallbackReason).toBe("input-too-large");
+    expect(turn.text).toBe(cloudText);
+    expect(turn.text).not.toContain("The input is too large");
+  });
+
+  it("does not hide a different model error behind the cloud model", async () => {
+    let cloud = 0;
+    await expect(withOnDeviceFallback({
+      runOnDevice: async () => { throw new Error("App Check permission-denied"); },
+      runInCloud: async () => { cloud += 1; return { text: cloudText, inferenceSource: "IN_CLOUD" }; },
+    })).rejects.toThrow(/App Check/);
+    expect(cloud).toBe(0);
+  });
+
+  it("shows the cloud path on the card after a size fallback", () => {
+    expect(pathDetail("IN_CLOUD", "input-too-large")).toMatch(/cloud with Gemini/);
+    expect(pathDetail("IN_CLOUD", "input-too-large")).toMatch(/too large/);
+    expect(pathDetail("ON_DEVICE")).toMatch(/did not leave the browser/);
+  });
+});
+
 describe("Firebase AI Logic is called from the client", () => {
   it("prefers on-device hybrid inference and does not open a chat session", () => {
     const source = readFileSync(new URL("../src/ai/client.ts", import.meta.url), "utf8");
@@ -230,6 +309,10 @@ describe("Firebase AI Logic is called from the client", () => {
     expect(source).toContain('import("firebase/app-check")');
     expect(source).toContain('import("firebase/remote-config")');
     expect(source).toContain("InferenceMode.PREFER_ON_DEVICE");
+    expect(source).toContain("InferenceMode.ONLY_IN_CLOUD");
+    expect(source).toContain("omitResponseConstraintInput");
+    expect(source).toContain("measureContextUsage");
+    expect(source).toContain("withOnDeviceFallback");
     expect(source).toContain("initializeDeviceModel");
     expect(source).toContain("getGenerativeModel");
     expect(source).toContain("GoogleAIBackend");

@@ -9,6 +9,8 @@ export type AnswerPath = InferencePath | "LOCAL";
 export interface ModelTurn {
   text: string;
   inferenceSource: InferencePath;
+  /** Set when Nano rejected the input and the cloud model answered instead. */
+  fallbackReason?: "input-too-large";
 }
 
 /**
@@ -35,11 +37,11 @@ export interface HybridRuntime {
 export const DEFAULT_EXPLAIN_SETTINGS: ExplainSettings = { enabled: true, maxFollowUps: 4 };
 
 export type ExplainOutcome =
-  | { ok: true; explanation: Explanation; path: InferencePath }
+  | { ok: true; explanation: Explanation; path: InferencePath; fallbackReason?: "input-too-large" }
   | { ok: false; message: string; code: string; path?: InferencePath };
 
 export type FollowUpOutcome =
-  | { ok: true; answer: string; path: AnswerPath }
+  | { ok: true; answer: string; path: AnswerPath; fallbackReason?: "input-too-large" }
   | { ok: false; message: string; code: string; path?: InferencePath };
 
 export function mapInferenceSource(value: unknown): InferencePath {
@@ -55,8 +57,11 @@ export function pathLabel(path: AnswerPath): string {
   return "Path not reported";
 }
 
-export function pathDetail(path: AnswerPath): string {
+export function pathDetail(path: AnswerPath, fallbackReason?: "input-too-large"): string {
   if (path === "ON_DEVICE") return "Ran on this device with Gemini Nano. This explanation did not leave the browser.";
+  if (path === "IN_CLOUD" && fallbackReason === "input-too-large") {
+    return "Ran in the cloud with Gemini. Gemini Nano rejected this input as too large, so Firebase AI Logic answered in the cloud instead.";
+  }
   if (path === "IN_CLOUD") return "Ran in the cloud with Gemini. This browser had no ready on-device model, so Firebase AI Logic used the cloud fallback.";
   if (path === "LOCAL") return "Blocked in the browser before any model saw the question.";
   return "The model answered, but did not report whether it ran on-device or in the cloud.";
@@ -65,6 +70,54 @@ export function pathDetail(path: AnswerPath): string {
 export function downloadPercent(fraction: number): number {
   if (!Number.isFinite(fraction)) return 0;
   return Math.max(0, Math.min(100, Math.round(fraction * 100)));
+}
+
+/**
+ * Chrome throws QuotaExceededError (DOMException code 22) when a prompt, including
+ * the system prompt and response schema, does not fit Gemini Nano's context window.
+ * Firebase's PREFER_ON_DEVICE mode does not catch that error, so we do.
+ */
+export function isInputTooLarge(err: unknown): boolean {
+  if (typeof err === "string") return /input is too large|quotaexceeded/i.test(err);
+  if (!err || typeof err !== "object") return false;
+  const candidate = err as { name?: unknown; message?: unknown; code?: unknown };
+  const name = typeof candidate.name === "string" ? candidate.name : "";
+  const message = typeof candidate.message === "string" ? candidate.message : "";
+  if (name === "QuotaExceededError") return true;
+  if (/input is too large|quotaexceeded/i.test(message)) return true;
+  return candidate.code === 22 && /quota|too large/i.test(`${name} ${message}`);
+}
+
+/** True when a measured prompt uses more of the context window than Nano has left. */
+export function contextWouldOverflow(usage: number, windowSize: number): boolean {
+  if (!Number.isFinite(usage) || !Number.isFinite(windowSize)) return false;
+  if (windowSize < 0) return true;
+  return usage > windowSize;
+}
+
+export async function withOnDeviceFallback(args: {
+  measure?: () => Promise<{ usage: number; windowSize: number } | null>;
+  runOnDevice: () => Promise<ModelTurn>;
+  runInCloud: () => Promise<ModelTurn>;
+}): Promise<ModelTurn> {
+  const useCloud = async (): Promise<ModelTurn> => {
+    const cloud = await args.runInCloud();
+    return { ...cloud, inferenceSource: "IN_CLOUD", fallbackReason: "input-too-large" };
+  };
+  if (args.measure) {
+    try {
+      const measured = await args.measure();
+      if (measured && contextWouldOverflow(measured.usage, measured.windowSize)) return useCloud();
+    } catch (err) {
+      if (isInputTooLarge(err)) return useCloud();
+    }
+  }
+  try {
+    return await args.runOnDevice();
+  } catch (err) {
+    if (!isInputTooLarge(err)) throw err;
+    return useCloud();
+  }
 }
 
 /** Remote Config values arrive as strings. Missing or blank falls back to the defaults. */
@@ -117,7 +170,7 @@ export async function explainVerdict(
     const turn = await explainer.explain(buildExplanationPrompt(check));
     const accepted = acceptExplanation(turn.text, check.verdict);
     if (!accepted.ok) return { ok: false, message: accepted.message, code: accepted.code, path: turn.inferenceSource };
-    return { ok: true, explanation: accepted.value, path: turn.inferenceSource };
+    return { ok: true, explanation: accepted.value, path: turn.inferenceSource, fallbackReason: turn.fallbackReason };
   } catch (err) {
     return { ok: false, ...classifyModelError(err) };
   }
@@ -143,7 +196,7 @@ export async function answerFollowUp(input: {
     }));
     const accepted = acceptFollowUp(turn.text, input.check.verdict);
     if (!accepted.ok) return { ok: false, message: accepted.message, code: accepted.code, path: turn.inferenceSource };
-    return { ok: true, answer: accepted.value.answer, path: turn.inferenceSource };
+    return { ok: true, answer: accepted.value.answer, path: turn.inferenceSource, fallbackReason: turn.fallbackReason };
   } catch (err) {
     return { ok: false, ...classifyModelError(err) };
   }
