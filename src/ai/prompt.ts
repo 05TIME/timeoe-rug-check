@@ -9,7 +9,7 @@ export const CLOUD_FALLBACK_MODEL = "gemini-3.5-flash-lite";
  * On-device hybrid inference does not support multi-turn chat, so follow-ups are
  * new single-turn prompts.
  */
-const RULES = "Explain a fixed Solana rug-check. Copy its verdict into verdictEcho. Do not change it, invent facts, recommend a trade, or ask for a wallet or seed phrase. notAdvice is true. JSON only.";
+const RULES = "Explain a fixed Solana rug-check. Copy its verdict into verdictEcho. The model can never alter the verdict. Do not change it, invent facts, recommend a trade, or ask for a wallet or seed phrase. notAdvice is true. JSON only.";
 
 export const EXPLAIN_SYSTEM = `${RULES} Keys: verdictEcho, headline, plainEnglish, whyTheseReasons, whatYouCanDo, notAdvice.`;
 export const FOLLOW_SYSTEM = `${RULES} Keys: verdictEcho, answer, notAdvice.`;

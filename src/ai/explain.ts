@@ -145,6 +145,18 @@ export function settingsFromRemote(values: { explain_enabled?: string; max_follo
 
 const SECRET_REQUEST = /\b(show|give|share|enter|paste|send|reveal|dump|extract)\b[\s\S]{0,40}\b(seed phrase|private key|recovery phrase|secret key|mnemonic)\b|\b(seed phrase|private key|recovery phrase|secret key|mnemonic)\b[\s\S]{0,40}\b(show|give|share|enter|paste|send|reveal|dump|extract)\b/i;
 
+export const VERDICT_OVERRIDE_REFUSAL = "I can't change the verdict. It comes from on-chain checks, not the AI.";
+
+/** Asks what a different verdict would require. These still go to the model. */
+const VERDICT_CONDITION_QUESTION = /\b(what|how|why)\b[\s\S]{0,60}\b(would|could|can|does|do|to|mean|means)\b/i;
+const COMMAND_TO_OVERRIDE = /\b(ignore|override|change\s+(this|it|the)|mark\s+it|say\s+it|give\s+(me\s+)?(a\s+)?(pass|fail|caution))\b/i;
+const VERDICT_OVERRIDE = /\bchange\b[\s\S]{0,40}\bto\b[\s\S]{0,24}\b(pass|caution|fail|green|safe)\b|\b(mark|label|set|switch|turn|flip)\b[\s\S]{0,30}\b(safe|green|pass|passes|caution|fail)\b|\bsay\b[\s\S]{0,30}\b(it |this )?(passes|is safe|is a pass|pass|green)\b|\bignore\b[\s\S]{0,60}\b(rules|rule|checker|checks|verdict)\b|\b(give|grant)\b[\s\S]{0,24}\b(me )?(a )?(pass|fail|caution|green)\b|\bmake\b[\s\S]{0,40}\b(verdict|badge|result|check)\b[\s\S]{0,24}\b(green|red|pass|fail|safe|caution)\b|\bmake\b[\s\S]{0,16}\b(it|this)\b[\s\S]{0,16}\b(green|safe|pass|a pass)\b|\boverride\b/i;
+
+export function asksToOverrideVerdict(question: string): boolean {
+  if (VERDICT_CONDITION_QUESTION.test(question) && !COMMAND_TO_OVERRIDE.test(question)) return false;
+  return VERDICT_OVERRIDE.test(question);
+}
+
 export function prepareQuestion(raw: string): { ok: true; question: string; localAnswer?: string } | { ok: false; message: string } {
   const question = raw.trim().replace(/\s+/g, " ");
   if (question.length < 3 || question.length > 500) {
@@ -156,6 +168,9 @@ export function prepareQuestion(raw: string): { ok: true; question: string; loca
       question,
       localAnswer: "TIMEŒ Rug Check never asks for a seed phrase or private key, and this explainer will not collect one. The verdict is unchanged.",
     };
+  }
+  if (asksToOverrideVerdict(question)) {
+    return { ok: true, question, localAnswer: VERDICT_OVERRIDE_REFUSAL };
   }
   return { ok: true, question };
 }
