@@ -8,6 +8,8 @@ import {
   DEFAULT_EXPLAIN_SETTINGS,
   downloadPercent,
   explainVerdict,
+  followUpsLeftLabel,
+  followUpsRemaining,
   pathDetail,
   pathLabel,
   type AnswerPath,
@@ -74,7 +76,8 @@ export default function ExplainPanel({ result }: { result: CheckSnapshot }) {
 
   const appCheck = appCheckMode(config);
   const modelAnswers = thread.filter((item) => item.path !== "LOCAL").length;
-  const followUpsLeft = settings.maxFollowUps - modelAnswers;
+  const followUpsLeft = followUpsRemaining(settings.maxFollowUps, modelAnswers);
+  const followUpsLabel = followUpsLeftLabel(settings.maxFollowUps, modelAnswers);
   const busy = phase === "device" || phase === "writing" || phase === "answering";
 
   async function onExplain() {
@@ -134,6 +137,7 @@ export default function ExplainPanel({ result }: { result: CheckSnapshot }) {
       {!bootError && !settings.enabled && !explanation && (
         <p className="notice">Explanations are switched off in Firebase Remote Config (explain_enabled). The verdict above did not use AI.</p>
       )}
+      {!bootError && settings.enabled && <p className="small">{followUpsLabel}</p>}
       {!bootError && settings.enabled && !explanation && (
         <button type="button" className="secondary" onClick={onExplain} disabled={!ready || busy} aria-busy={busy}>
           {phase === "device" ? `Preparing the on-device model${progress === null ? "…" : `… ${progress}%`}` : phase === "writing" ? "Writing the explanation…" : "Explain this verdict"}
@@ -169,7 +173,7 @@ export default function ExplainPanel({ result }: { result: CheckSnapshot }) {
           <button type="submit" className="secondary" disabled={busy || question.trim().length < 3}>{phase === "answering" ? "Answering…" : "Ask"}</button>
         </form>
       )}
-      {explanation && followUpsLeft <= 0 && <p className="small">Follow-up limit reached. The verdict is unchanged.</p>}
+      {explanation && followUpsLeft <= 0 && <p className="small">{followUpsLabel}. The verdict is unchanged.</p>}
     </section>
   );
 }

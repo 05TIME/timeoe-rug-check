@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isValidMint } from "../../../src/validate";
-import { checkMint } from "../../../src/server/check";
+import { checkMint, NotATokenMintError } from "../../../src/server/check";
 import { allow } from "../../../src/server/ratelimit";
 import { RATE_LIMIT } from "../../../src/server/config";
 
@@ -15,7 +15,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "That is not a valid Solana token address." }, { status: 400 });
   try {
     return NextResponse.json(await checkMint(mint), { headers: { "cache-control": "no-store" } });
-  } catch {
+  } catch (err) {
+    if (err instanceof NotATokenMintError)
+      return NextResponse.json({ error: err.message }, { status: 400 });
     return NextResponse.json({ error: "Check failed. Please try again shortly." }, { status: 503 });
   }
 }

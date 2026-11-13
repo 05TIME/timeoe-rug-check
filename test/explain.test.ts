@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { appCheckMode, readFirebasePublicConfig } from "../src/ai/config";
 import { buildExplanationPrompt, buildFollowUpPrompt, EXPLAIN_SYSTEM, FOLLOW_SYSTEM, ON_DEVICE_USER_PROMPT_MAX, type CheckSnapshot } from "../src/ai/prompt";
 import { acceptExplanation, acceptFollowUp, readModelJson } from "../src/ai/schema";
-import { answerFollowUp, classifyModelError, contextWouldOverflow, downloadPercent, explainVerdict, isInputTooLarge, mapInferenceSource, pathDetail, prepareQuestion, settingsFromRemote, withOnDeviceFallback, type Explainer, type ModelTurn } from "../src/ai/explain";
+import { answerFollowUp, classifyModelError, contextWouldOverflow, downloadPercent, explainVerdict, followUpsLeftLabel, followUpsRemaining, isInputTooLarge, mapInferenceSource, pathDetail, prepareQuestion, settingsFromRemote, withOnDeviceFallback, type Explainer, type ModelTurn } from "../src/ai/explain";
 
 const check: CheckSnapshot = {
   mint: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
@@ -83,6 +83,14 @@ describe("Remote Config settings", () => {
   it("lets Remote Config turn explanations off and clamps follow-ups", () => {
     expect(settingsFromRemote({ explain_enabled: "false", max_followups: "99" })).toEqual({ enabled: false, maxFollowUps: 8 });
     expect(settingsFromRemote({ explain_enabled: "yes", max_followups: "0" }).maxFollowUps).toBe(0);
+  });
+  it("shows how many follow-up questions are left, defaulting to 4", () => {
+    expect(settingsFromRemote({}).maxFollowUps).toBe(4);
+    expect(followUpsRemaining(4, 0)).toBe(4);
+    expect(followUpsLeftLabel(4, 0)).toBe("4 follow-up questions left");
+    expect(followUpsLeftLabel(4, 3)).toBe("1 follow-up question left");
+    expect(followUpsLeftLabel(4, 4)).toBe("0 follow-up questions left");
+    expect(followUpsLeftLabel(Number.NaN, 1)).toBe("3 follow-up questions left");
   });
 });
 

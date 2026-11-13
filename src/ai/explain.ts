@@ -36,6 +36,18 @@ export interface HybridRuntime {
 
 export const DEFAULT_EXPLAIN_SETTINGS: ExplainSettings = { enabled: true, maxFollowUps: 4 };
 
+export function followUpsRemaining(maxFollowUps: number, asked: number): number {
+  const max = Number.isFinite(maxFollowUps) ? Math.max(0, Math.floor(maxFollowUps)) : DEFAULT_EXPLAIN_SETTINGS.maxFollowUps;
+  const used = Number.isFinite(asked) ? Math.max(0, Math.floor(asked)) : 0;
+  return Math.max(0, max - used);
+}
+
+/** Copy for the explanation card. Remote Config supplies maxFollowUps; the default is 4. */
+export function followUpsLeftLabel(maxFollowUps: number, asked: number): string {
+  const left = followUpsRemaining(maxFollowUps, asked);
+  return left === 1 ? "1 follow-up question left" : `${left} follow-up questions left`;
+}
+
 export type ExplainOutcome =
   | { ok: true; explanation: Explanation; path: InferencePath; fallbackReason?: "input-too-large" }
   | { ok: false; message: string; code: string; path?: InferencePath };
