@@ -9,6 +9,7 @@ form { display:flex; gap:10px; flex-wrap: wrap; }
 input { flex: 1 1 320px; min-width:0; font-size:17px; /* >=16px stops iOS zoom */ padding:14px; border-radius:12px; border:1px solid #2c3343; background:#0f131b; color:var(--fg); }
 button { font-size:17px; padding:14px 22px; border-radius:12px; border:0; background:#5b7cfa; color:#fff; font-weight:600; min-height:48px; cursor:pointer; touch-action: manipulation; }
 button:disabled { opacity:.6; }
+button.secondary { background: transparent; color: var(--fg); border: 1px solid #3a445c; }
 .card { background:var(--card); border-radius:16px; padding:18px; margin-top:20px; }
 .badge { display:inline-block; font-weight:800; font-size:22px; padding:6px 14px; border-radius:10px; color:#0d1017; }
 .PASS{background:var(--pass)} .CAUTION{background:var(--caution)} .FAIL{background:var(--fail)}
@@ -17,3 +18,13 @@ ul { padding-left: 20px; } li { margin: 6px 0; }
 .small { font-size: 14px; color: var(--mute); }
 .err { color: var(--fail); }
 .disclaimer { border:1px solid #2c3343; }
+.ai { border: 1px solid #2c3d66; }
+.ai h2 { font-size: 20px; margin: 0 0 8px; }
+.ai h3 { font-size: 18px; margin: 12px 0 6px; }
+.notice { color: var(--mute); margin: 8px 0; }
+.path { display: inline-block; font-size: 14px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #243049; color: #d5def7; }
+.path.ON_DEVICE { background: #163528; color: #b6ebcd; }
+.path.IN_CLOUD { background: #2a3350; color: #d5def7; }
+.path.LOCAL { background: #2c2616; color: #f0e0b0; }
+.qa { list-style: none; padding: 0; margin: 12px 0 0; }
+.qa li { margin-top: 14px; }

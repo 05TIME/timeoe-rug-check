@@ -1,5 +1,6 @@
 "use client";
 import { useState, type FormEvent } from "react";
+import ExplainPanel from "./explain-panel";
 
 type Result = { mint: string; name?: string; symbol?: string; verdict: "PASS" | "CAUTION" | "FAIL"; reasons: string[]; sources: { name: string; ok: boolean }[]; checkedAt: string };
 
@@ -24,7 +25,7 @@ export default function Page() {
   return (
     <main>
       <h1>TIMEŒ Rug Check</h1>
-      <p className="sub">Paste a Solana token mint address for a plain-language risk check. Free and read-only.</p>
+      <p className="sub">Paste a Solana token mint address for a plain-language risk check. Free and read-only. The verdict comes from fixed checks. An optional explanation can translate it and never changes it.</p>
       <form onSubmit={onSubmit}>
         <input value={mint} onChange={(e) => setMint(e.target.value)} placeholder="Token mint address" aria-label="Token mint address"
           autoCapitalize="off" autoCorrect="off" autoComplete="off" spellCheck={false} inputMode="text" />
@@ -41,6 +42,7 @@ export default function Page() {
           <p className="small">Checked {new Date(res.checkedAt).toLocaleString()}</p>
         </section>
       )}
+      {res && <ExplainPanel key={`${res.mint}-${res.checkedAt}`} result={res} />}
       <section className="card disclaimer">
         <p><strong>Not financial advice.</strong> TIMEŒ Rug Check is a free, automated tool that reads public blockchain and market data and applies simple heuristics. Results can be wrong, incomplete or out of date, and a &quot;PASS&quot; does not mean a token is safe or a good investment. Always do your own research and never invest more than you can afford to lose. No liability is accepted for decisions made using this tool.</p>
         <p><strong>TIMEŒ Rug Check will never ask you to connect a wallet, share a seed phrase or private key, or send funds.</strong></p>
