@@ -31,7 +31,7 @@ export interface ExplainSettings {
 export interface HybridRuntime {
   explainer: Explainer;
   settings: ExplainSettings;
-  appCheck: "recaptcha" | "debug" | "missing";
+  appCheck: "enterprise" | "debug" | "missing";
 }
 
 export const DEFAULT_EXPLAIN_SETTINGS: ExplainSettings = { enabled: true, maxFollowUps: 4 };

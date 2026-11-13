@@ -12,12 +12,18 @@ export interface FirebasePublicConfig {
   appId: string;
   storageBucket?: string;
   messagingSenderId?: string;
+  /**
+   * reCAPTCHA Enterprise site key (Fraud Defense, score-based, no checkbox).
+   * The Enterprise env var wins. The classic variable is only a name fallback
+   * for a key already stored under the old name. Either value is passed to
+   * ReCaptchaEnterpriseProvider. A classic reCAPTCHA v3 key will not attest.
+   */
   appCheckSiteKey?: string;
   /** Local demo only. Never set this on the production deployment. */
   appCheckDebugToken?: string;
 }
 
-export type AppCheckMode = "recaptcha" | "debug" | "missing";
+export type AppCheckMode = "enterprise" | "debug" | "missing";
 
 type Env = Record<string, string | undefined>;
 
@@ -35,6 +41,7 @@ export function firebasePublicEnv(): Env {
     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_ENTERPRISE_SITE_KEY: process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_ENTERPRISE_SITE_KEY,
     NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_SITE_KEY: process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_SITE_KEY,
     NEXT_PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN: process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN,
   };
@@ -54,13 +61,14 @@ export function readFirebasePublicConfig(env: Env = firebasePublicEnv()): Fireba
     appId,
     storageBucket: filled(env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET),
     messagingSenderId: filled(env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID),
-    appCheckSiteKey: filled(env.NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_SITE_KEY),
+    appCheckSiteKey: filled(env.NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_ENTERPRISE_SITE_KEY)
+      ?? filled(env.NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_SITE_KEY),
     appCheckDebugToken: filled(env.NEXT_PUBLIC_FIREBASE_APPCHECK_DEBUG_TOKEN),
   };
 }
 
 export function appCheckMode(config: FirebasePublicConfig): AppCheckMode {
-  if (config.appCheckSiteKey) return "recaptcha";
+  if (config.appCheckSiteKey) return "enterprise";
   if (config.appCheckDebugToken) return "debug";
   return "missing";
 }

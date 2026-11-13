@@ -50,14 +50,28 @@ describe("Firebase config", () => {
     expect(readFirebasePublicConfig({})).toBeNull();
     expect(readFirebasePublicConfig({ ...fullEnv, NEXT_PUBLIC_FIREBASE_APP_ID: "  " })).toBeNull();
   });
-  it("reads the web config and treats App Check as optional", () => {
+  it("reads the web config and leaves App Check missing until a site key is set", () => {
     const config = readFirebasePublicConfig({ ...fullEnv, NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: " rug.appspot.com " });
     expect(config).toMatchObject({ apiKey: "test-key", projectId: "rug", storageBucket: "rug.appspot.com" });
     expect(config && appCheckMode(config)).toBe("missing");
   });
-  it("distinguishes a reCAPTCHA site key from a debug token", () => {
-    expect(appCheckMode({ ...fullEnv, apiKey: "k", authDomain: "a", projectId: "p", appId: "i", appCheckSiteKey: "site" })).toBe("recaptcha");
-    expect(appCheckMode({ ...fullEnv, apiKey: "k", authDomain: "a", projectId: "p", appId: "i", appCheckDebugToken: "true" })).toBe("debug");
+  it("prefers the reCAPTCHA Enterprise site key and falls back to the old name", () => {
+    const base = { ...fullEnv, apiKey: "k", authDomain: "a", projectId: "p", appId: "i" };
+    const enterprise = readFirebasePublicConfig({
+      ...base,
+      NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_ENTERPRISE_SITE_KEY: " enterprise-key ",
+      NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_SITE_KEY: "classic-name",
+    });
+    expect(enterprise?.appCheckSiteKey).toBe("enterprise-key");
+    expect(enterprise && appCheckMode(enterprise)).toBe("enterprise");
+    const fallback = readFirebasePublicConfig({
+      ...base,
+      NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_ENTERPRISE_SITE_KEY: "  ",
+      NEXT_PUBLIC_FIREBASE_APPCHECK_RECAPTCHA_SITE_KEY: "stored-under-old-name",
+    });
+    expect(fallback?.appCheckSiteKey).toBe("stored-under-old-name");
+    expect(fallback && appCheckMode(fallback)).toBe("enterprise");
+    expect(appCheckMode({ ...base, appCheckDebugToken: "true" })).toBe("debug");
   });
 });
 
@@ -307,6 +321,8 @@ describe("Firebase AI Logic is called from the client", () => {
     const prompt = readFileSync(new URL("../src/ai/prompt.ts", import.meta.url), "utf8");
     expect(source).toContain('import("firebase/ai")');
     expect(source).toContain('import("firebase/app-check")');
+    expect(source).toContain("ReCaptchaEnterpriseProvider");
+    expect(source).not.toContain("ReCaptchaV3Provider");
     expect(source).toContain('import("firebase/remote-config")');
     expect(source).toContain("InferenceMode.PREFER_ON_DEVICE");
     expect(source).toContain("InferenceMode.ONLY_IN_CLOUD");

@@ -38,7 +38,7 @@ async function boot(): Promise<HybridRuntime> {
   if (typeof window === "undefined") throw new Error("Firebase AI Logic runs in the browser");
 
   const { getApps, initializeApp } = await import("firebase/app");
-  const { initializeAppCheck, ReCaptchaV3Provider, CustomProvider } = await import("firebase/app-check");
+  const { initializeAppCheck, ReCaptchaEnterpriseProvider, CustomProvider } = await import("firebase/app-check");
   const { getAI, getGenerativeModel, GoogleAIBackend, InferenceMode, Schema } = await import("firebase/ai");
   const { getRemoteConfig, fetchAndActivate, getValue } = await import("firebase/remote-config");
 
@@ -57,7 +57,7 @@ async function boot(): Promise<HybridRuntime> {
   });
 
   const provider = config.appCheckSiteKey
-    ? new ReCaptchaV3Provider(config.appCheckSiteKey)
+    ? new ReCaptchaEnterpriseProvider(config.appCheckSiteKey)
     : config.appCheckDebugToken
       // Debug exchange does not call the provider. initializeAppCheck still requires one.
       ? new CustomProvider({ getToken: async () => ({ token: "unused-debug-placeholder", expireTimeMillis: Date.now() + 60_000 }) })
